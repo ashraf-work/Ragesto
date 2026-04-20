@@ -1,0 +1,24 @@
+{
+    "Version": "2008-10-17",
+    "Id": "PolicyForCloudFrontPrivateContent",
+    "Statement": [
+        {
+            "Sid": "AllowCloudFrontServicePrincipal",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "cloudfront.amazonaws.com"
+            },
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::storage-app-new/*",
+            "Condition": {
+                "ArnLike": {
+                    "AWS:SourceArn": [
+                        "arn:aws:cloudfront::618972981535:distribution/E1K4WO3IQN0BT9",
+                        "arn:aws:cloudfront::618972981535:distribution/EEW7DAW236QF2",
+                        "arn:aws:cloudfront::618972981535:distribution/EVJNA4E9AKD3W"
+                    ]
+                }
+            }
+        }
+    ]
+}
