@@ -1,3 +1,4 @@
+/* global google */
 import { useNavigate } from "react-router-dom";
 import useDrivePicker from "react-google-drive-picker";
 import { useModal } from "../Contexts/ModalContext";
@@ -68,8 +69,9 @@ export default function ImportFromDrive({
       finish();
       navigate("/");
       setActionDone(true);
-    } catch (err) {
+    } catch (error) {
       reset();
+      console.error("Drive import failed", error);
       showModal("Error", "Drive import failed.", "error");
     }
   }

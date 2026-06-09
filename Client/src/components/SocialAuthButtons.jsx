@@ -1,6 +1,5 @@
 import { useGoogleLogin } from "@react-oauth/google";
 import { BsGithub } from "react-icons/bs";
-import { useNavigate } from "react-router-dom";
 import { googleAuth } from "../Apis/authApi";
 import { useAuth } from "../Contexts/AuthContext";
 import { useModal } from "../Contexts/ModalContext";
@@ -9,7 +8,6 @@ import { showSessionLimitExceedModal } from "../Utils/helpers";
 export default function SocialAuthButtons({ setError, githubURL }) {
   const { checkAuthentication } = useAuth();
   const { showModal, showConfirmModal, closeConfirmModal } = useModal();
-  const navigate = useNavigate();
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (response) => {

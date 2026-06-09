@@ -1,51 +1,77 @@
 import { StatusCodes } from "http-status-codes";
-import { validateWebhookSignature } from "razorpay/dist/utils/razorpay-utils.js";
-import Webhook from "../models/razorpayWebhookModel.js";
+import StripeWebhook from "../models/stripeWebhookModel.js";
 import { WebhookServices } from "../services/index.js";
+import { getStripeClient } from "../services/stripeService.js";
 import CustomError from "../utils/ErrorResponse.js";
 
-export const razorpayWebhookController = async (req, res, next) => {
+export const stripeWebhookController = async (req, res, next) => {
   try {
-    const webhookBody = req.body;
-    const webhookSignature = req.headers["x-razorpay-signature"];
-    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+    console.log(req.body)
+    const stripe = getStripeClient();
+    const webhookSignature = req.headers["stripe-signature"];
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-    const isValidRequest = validateWebhookSignature(
-      JSON.stringify(webhookBody),
-      webhookSignature,
-      webhookSecret
-    );
-
-    if (!isValidRequest) {
-      throw new CustomError("Invalid signature", StatusCodes.BAD_REQUEST);
+    if (!webhookSecret) {
+      throw new CustomError(
+        "Stripe webhook secret is not configured",
+        StatusCodes.INTERNAL_SERVER_ERROR
+      );
     }
 
-    const event = webhookBody?.event;
-    const webhookSubscription = webhookBody.payload.subscription.entity;
-    const userId = webhookSubscription.notes.userId;
+    let event;
+    try {
+      event = stripe.webhooks.constructEvent(
+        req.body,
+        webhookSignature,
+        webhookSecret
+      );
+    } catch (error) {
+      throw new CustomError(
+        `Invalid Stripe webhook signature: ${error.message}`,
+        StatusCodes.BAD_REQUEST
+      );
+    }
 
-    const webhookDoc = await Webhook.create({
-      userId,
-      razorpaySubscriptionId: webhookSubscription.id,
-      eventType: event,
+    const existingWebhook = await StripeWebhook.findOne({
+      eventId: event.id,
+      status: "processed",
+    }).lean();
+
+    if (existingWebhook) {
+      return res.status(StatusCodes.OK).send("Webhook already processed");
+    }
+
+    const eventObject = event.data.object;
+    const webhookDoc = await StripeWebhook.create({
+      eventId: event.id,
+      userId:
+        eventObject?.metadata?.userId ||
+        eventObject?.client_reference_id ||
+        null,
+      stripeSubscriptionId:
+        typeof eventObject?.subscription === "string"
+          ? eventObject.subscription
+          : eventObject?.id?.startsWith("sub_")
+          ? eventObject.id
+          : null,
+      stripeCheckoutSessionId:
+        eventObject?.object === "checkout.session" ? eventObject.id : null,
+      eventType: event.type,
       signature: webhookSignature,
-      payload: webhookBody,
+      payload: event,
       status: "pending",
     });
 
-    const message = await WebhookServices.RazorpayEventHandler(
-      event,
-      webhookBody
-    );
+    const message = await WebhookServices.StripeEventHandler(event);
 
     webhookDoc.status = "processed";
     webhookDoc.responseMessage = message;
     webhookDoc.processedAt = new Date();
     await webhookDoc.save();
 
-    res.status(StatusCodes.OK).send("Webhook processed successfully");
+    return res.status(StatusCodes.OK).send("Webhook processed successfully");
   } catch (error) {
-    console.error("Razorpay Webhook Error:", error);
+    console.error("Stripe Webhook Error:", error);
     next(error);
   }
 };

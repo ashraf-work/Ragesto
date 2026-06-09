@@ -1,7 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import Subscription from "../../models/subscriptionModel.js";
 import CustomError from "../../utils/ErrorResponse.js";
-import { razorpayInstance } from "../razorpayService.js";
 import Directory from "../../models/dirModel.js";
 import { formatFileSize } from "../../utils/formatFileSize.js";
 import createSubscription from "./createSubscription.js";
@@ -9,63 +8,32 @@ import subscriptionStatus from "./subscriptionStatus.js";
 import cancelSubscription from "./cancelSubscription.js";
 import getEligiblePlansForChange from "./getEligiblePlans.js";
 import changePlan from "./changePlan.js";
+import { createStripeCheckoutSession } from "../stripeService.js";
 
-/**
- * Create a new subscription on Razorpay
- */
-export const createRazorpaySubscriptionService = async (planId, userId) => {
-  const razorpayResponse = await razorpayInstance.subscriptions.create({
-    plan_id: planId,
-    total_count: 12,
-    notes: { userId: userId.toString() },
+const handleNewSubscriptionCreation = async (user, planDetails, status) => {
+  const subscriptionDoc = await Subscription.create({
+    userId: user._id,
+    planId: planDetails.id,
+    status,
+  });
+
+  const session = await createStripeCheckoutSession({
+    user,
+    subscriptionDoc,
+    planDetails,
   });
 
   return {
-    data: razorpayResponse?.status === "created" ? razorpayResponse : null,
+    newSubscriptionId: subscriptionDoc._id,
+    ...session,
   };
-};
-
-/**
- * Cancel existing Razorpay subscription
- */
-export const cancelSubscriptionService = async (subscriptionId) => {
-  const razorpayResponse =
-    await razorpayInstance.subscriptions.cancel(subscriptionId);
-  return { success: razorpayResponse?.status === "cancelled" };
-};
-
-/**
- * Helper function to create a new subscription record in DB and Razorpay
- */
-const handleNewSubscriptionCreation = async (userId, planId, status) => {
-  const { data } = await createRazorpaySubscriptionService(planId, userId);
-  if (!data) {
-    throw new CustomError(
-      "Failed to create subscription",
-      StatusCodes.BAD_REQUEST
-    );
-  }
-
-  await Subscription.create({
-    userId: userId,
-    planId: planId,
-    razorpaySubscriptionId: data.id,
-    currentPeriodEnd: null,
-    currentPeriodStart: null,
-    endDate: null,
-    startDate: null,
-    invoiceId: null,
-    status: status,
-  });
-
-  return { newSubscriptionId: data.id };
 };
 
 /**
  * Upgrade or cycle-change service
  */
-export const upgradeSubscriptionService = async ({ userId, desirePlan }) => {
-  return handleNewSubscriptionCreation(userId, desirePlan.id, "pending");
+export const upgradeSubscriptionService = async ({ user, desirePlan }) => {
+  return handleNewSubscriptionCreation(user, desirePlan, "pending");
 };
 
 /**
@@ -96,7 +64,7 @@ export const downgradeSubscriptionService = async ({ user, desirePlan }) => {
   }
 
   // 2. Proceed with subscription creation
-  return handleNewSubscriptionCreation(user._id, desirePlan.id, "pending");
+  return handleNewSubscriptionCreation(user, desirePlan, "pending");
 };
 
 export default {

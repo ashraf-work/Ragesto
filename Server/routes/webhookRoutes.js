@@ -1,8 +1,13 @@
 import { Router } from "express";
-import { razorpayWebhookController } from "../controllers/webhookControllers.js";
+import express from "express";
+import { stripeWebhookController } from "../controllers/webhookControllers.js";
 
 const router = Router();
 
-router.post("/razorpay", razorpayWebhookController)
+router.post(
+  "/stripe",
+  express.raw({ type: "application/json" }),
+  stripeWebhookController
+);
 
 export default router;

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { googleAuth, login, sendOTP } from "../../Apis/authApi";
+import { login, sendOTP } from "../../Apis/authApi";
 import LoginCredentialForm from "../../components/Forms/LoginCredentialForm";
 import OTPForm from "../../components/Forms/OTPForm";
 import SocialAuthButtons from "../../components/SocialAuthButtons";
@@ -8,6 +8,7 @@ import StepProgress from "../../components/StepProgress";
 import { useAuth } from "../../Contexts/AuthContext";
 import { showSessionLimitExceedModal } from "../../Utils/helpers";
 import { useModal } from "../../Contexts/ModalContext";
+import { API_BASE_URL } from "../../Utils/apiBaseUrl";
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ export default function LoginForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const URL = import.meta.env.VITE_BACKEND_URL;
+  const URL = API_BASE_URL;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

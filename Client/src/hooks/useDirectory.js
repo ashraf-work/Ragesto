@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { getItemList } from "../Apis/file_Dir_Api";
-import { useAuth } from "../Contexts/AuthContext";
-import { toast } from "sonner";
 
 const useDirectory = () => {
   const [files, setFiles] = useState([]);
@@ -26,7 +24,7 @@ const useDirectory = () => {
     try {
       const res = await getItemList(dirId);
       if (res.success) {
-        const { files, directory, name, breadCrumb } = res.data;
+        const { files, directory, breadCrumb } = res.data;
         setBreadCrumb(breadCrumb);
         setFiles(files);
         setDirectories(directory);

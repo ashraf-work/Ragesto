@@ -1,14 +1,13 @@
 import { Check, Crown, Sparkles, Zap } from "lucide-react";
 import { useState } from "react";
 import { handleCreateSubscription } from "../../Apis/subscriptionApi";
-import { useAuth } from "../../Contexts/AuthContext";
-import RedirectModal from "../../components/Modals/RedirectModal";
+import { toast } from "sonner";
+import { redirectToStripeCheckout } from "../../Utils/stripeCheckout";
 
 export const monthlyPlans = [
   {
     id: {
-      test: "free-monthly-001",
-      live: "free-monthly-001",
+      value: "free-monthly",
     },
     name: "Free",
     tagline: "Starter Plan",
@@ -26,8 +25,7 @@ export const monthlyPlans = [
   },
   {
     id: {
-      test: "plan_Ra0GqWQ6p0ffYM",
-      live: "plan_RWtFksDzZOsg2V",
+      value: "pro-monthly",
     },
     name: "Pro",
     billingCycle: "Month",
@@ -46,8 +44,7 @@ export const monthlyPlans = [
   },
   {
     id: {
-      test: "plan_Ra0Hyby0MmmZyU",
-      live: "plan_RWtGxMLUNKVu35",
+      value: "premium-monthly",
     },
     name: "Premium",
     billingCycle: "Month",
@@ -68,8 +65,7 @@ export const monthlyPlans = [
 export const yearlyPlans = [
   {
     id: {
-      test: "free-yearly-001",
-      live: "free-yearly-001",
+      value: "free-yearly",
     },
     name: "Free",
     billingCycle: "Year",
@@ -87,8 +83,7 @@ export const yearlyPlans = [
   },
   {
     id: {
-      test: "plan_Ra0HCHX7tNXrQl",
-      live: "plan_RWtGEM0EVl0gJE",
+      value: "pro-yearly",
     },
     name: "Pro",
     billingCycle: "Year",
@@ -109,8 +104,7 @@ export const yearlyPlans = [
   },
   {
     id: {
-      test: "plan_Ra0IGCFRabuW1y",
-      live: "plan_RWtGgZRP6VnyUc",
+      value: "premium-yearly",
     },
     name: "Premium",
     billingCycle: "Year",
@@ -133,30 +127,23 @@ export const yearlyPlans = [
 const Plans = ({ hasActivePlan }) => {
   const [billingCycle, setBillingCycle] = useState("monthly");
   const [loadingPlanId, setLoadingPlanId] = useState(null);
-  const [showRedirectModal, setShowRedirectModal] = useState(false);
-  const [redirectUrl, setRedirectUrl] = useState("");
-  const { user } = useAuth();
-  const razorpayMode = user?.razorpayMode;
 
   const handleSubmit = async (planId) => {
     setLoadingPlanId(planId);
     try {
       const res = await handleCreateSubscription(planId);
-      const subscriptionId = res.data.subscriptionId;
-      const url = `http://payments.ragesto.com`;
-      // const url = `https://payments.ashrafsaleem.me?subscriptionId=${subscriptionId}&userId=${user._id}`;
-      setRedirectUrl(url);
-      setShowRedirectModal(true);
-      setLoadingPlanId(null);
+      if (!res?.success) {
+        toast.error(res?.message || "Unable to start Stripe checkout");
+        return;
+      }
+
+      redirectToStripeCheckout({ checkoutUrl: res.data.checkoutUrl });
     } catch (error) {
       console.error("Subscription error:", error);
+      toast.error(error?.message || "Unable to start Stripe checkout");
+    } finally {
       setLoadingPlanId(null);
     }
-  };
-
-  const handleCloseModal = () => {
-    setShowRedirectModal(false);
-    setRedirectUrl("");
   };
 
   const currentPlans = billingCycle === "monthly" ? monthlyPlans : yearlyPlans;
@@ -210,7 +197,7 @@ const Plans = ({ hasActivePlan }) => {
 
               return (
                 <div
-                  key={plan.id[razorpayMode]}
+                  key={plan.id.value}
                   className={`relative bg-white rounded-lg border  overflow-hidden transition-all ${
                     plan.popular
                       ? "border-blue-500 ring-2 ring-blue-500"
@@ -300,9 +287,9 @@ const Plans = ({ hasActivePlan }) => {
 
                     {/* CTA Button */}
                     <button
-                      onClick={() => handleSubmit(plan.id[razorpayMode])}
+                      onClick={() => handleSubmit(plan.id.value)}
                       disabled={
-                        loadingPlanId === plan.id[razorpayMode] || isCurrentPlan
+                        loadingPlanId === plan.id.value || isCurrentPlan
                       }
                       className={`w-full py-2.5 px-6 rounded-lg font-medium transition-all text-sm mb-6 ${
                         isCurrentPlan
@@ -311,11 +298,11 @@ const Plans = ({ hasActivePlan }) => {
                           ? "bg-blue-600 text-white hover:bg-blue-700 "
                           : "bg-gray-900 text-white hover:bg-gray-800 "
                       } ${
-                        loadingPlanId === plan.id[razorpayMode] &&
+                        loadingPlanId === plan.id.value &&
                         "opacity-60 cursor-not-allowed"
                       }`}
                     >
-                      {loadingPlanId === plan.id[razorpayMode] ? (
+                      {loadingPlanId === plan.id.value ? (
                         <div className="flex items-center justify-center gap-2">
                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                           <span>Processing...</span>
@@ -362,13 +349,6 @@ const Plans = ({ hasActivePlan }) => {
           </div>
         </div>
       </div>
-
-      {/* Redirect Modal */}
-      <RedirectModal
-        isOpen={showRedirectModal}
-        onClose={handleCloseModal}
-        redirectUrl={redirectUrl}
-      />
     </>
   );
 };

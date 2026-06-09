@@ -13,8 +13,12 @@ import { validateInputs } from "../../utils/ValidateInputs.js";
 import { nameSchema } from "../../validators/commonValidation.js";
 import { deleteS3Objects, s3Client } from "../file/s3Services.js";
 import { DirectoryServices } from "../index.js";
-import { razorpayInstance } from "../razorpayService.js";
 import Subscription from "../../models/subscriptionModel.js";
+import {
+  cancelStripeSubscription,
+  pauseStripeSubscription,
+  resumeStripeSubscription,
+} from "../stripeService.js";
 
 const logoutUserService = async (token) => {
   await redisClient.del(`session:${token}`);
@@ -123,11 +127,7 @@ const softDeleteUserService = async (userId, currentUser) => {
 
   // Pause the subscription of the user (If any subscription is there).
   if (user.subscriptionId) {
-    // Calling razorpay pause subscription API
-    await razorpayInstance.subscriptions.pause(
-      user.subscriptionId.razorpaySubscriptionId,
-      { pause_at: "now" }
-    );
+    await pauseStripeSubscription(user.subscriptionId.stripeSubscriptionId);
 
     // updating the DB
     await Subscription.findByIdAndUpdate(user.subscriptionId._id, {
@@ -210,11 +210,7 @@ const recoverUserService = async (userId, currentUser) => {
 
   // If user has a subscription (Resume it)
   if (user.subscriptionId) {
-    // Calling razorpay resume subscription API
-    await razorpayInstance.subscriptions.resume(
-      user.subscriptionId.razorpaySubscriptionId,
-      { resume_at: "now" }
-    );
+    await resumeStripeSubscription(user.subscriptionId.stripeSubscriptionId);
 
     // Update the DB
     await Subscription.findByIdAndUpdate(user.subscriptionId._id, {
@@ -318,11 +314,7 @@ const disableUserService = async (userId) => {
 
   // Pause the subscription of the user (If any subscription is there).
   if (user.subscriptionId) {
-    // Calling razorpay pause subscription API
-    await razorpayInstance.subscriptions.pause(
-      user.subscriptionId.razorpaySubscriptionId,
-      { pause_at: "now" }
-    );
+    await pauseStripeSubscription(user.subscriptionId.stripeSubscriptionId);
 
     // updating the DB
     await Subscription.findByIdAndUpdate(user.subscriptionId._id, {
@@ -348,13 +340,10 @@ const deleteUserService = async (userId) => {
   // cancelling the userSubscription and delete it from DB
   if (user.subscriptionId) {
     try {
-      await razorpayInstance.subscriptions.cancel(
-        user.subscriptionId.razorpaySubscriptionId,
-        false // cancel immediately
-      );
+      await cancelStripeSubscription(user.subscriptionId.stripeSubscriptionId);
       await Subscription.findByIdAndDelete(user.subscriptionId._id);
     } catch (err) {
-      console.error("Razorpay cancel error:", err);
+      console.error("Stripe cancel error:", err);
     }
   }
 

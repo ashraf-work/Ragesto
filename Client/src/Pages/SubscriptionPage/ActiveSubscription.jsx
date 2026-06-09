@@ -88,7 +88,7 @@ const ActiveSubscription = ({
                   </p>
                 </div>
                 <p className="text-lg font-semibold text-gray-900">
-                  ₹{subscriptionDetails.planPrice || "0"}
+                  ${subscriptionDetails.planPrice || "0"}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
                   {/* Capitalizing */}

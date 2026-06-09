@@ -4,12 +4,11 @@ import StepProgress from "../../components/StepProgress";
 import CredentialsForm from "../../components/Forms/CredentialsForm";
 import OTPForm from "../../components/Forms/OTPForm";
 import SocialAuthButtons from "../../components/SocialAuthButtons";
-import { googleAuth, register, sendOTP } from "../../Apis/authApi";
-import { useAuth } from "../../Contexts/AuthContext";
+import { register, sendOTP } from "../../Apis/authApi";
+import { API_BASE_URL } from "../../Utils/apiBaseUrl";
 
 export default function RegistrationForm() {
   const navigate = useNavigate();
-  const { setIsAuth } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -20,7 +19,7 @@ export default function RegistrationForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const URL = import.meta.env.VITE_BACKEND_URL;
+  const URL = API_BASE_URL;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

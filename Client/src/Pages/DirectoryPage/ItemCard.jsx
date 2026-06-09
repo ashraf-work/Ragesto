@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { deleteFile_or_Directory } from "../../Apis/file_Dir_Api";
 import { useModal } from "../../Contexts/ModalContext";
+import { API_BASE_URL } from "../../Utils/apiBaseUrl";
 import RenameModal from "./RenameModal";
 import GridView from "./view/GridView";
 import ListView from "./view/ListView";
@@ -29,7 +30,7 @@ const ItemCard = ({
     if (item.type === "directory") {
       navigate(`/directory/${item._id}`);
     } else {
-      window.open(`${import.meta.env.VITE_BACKEND_URL}/file/${item._id}`, "_blank");
+      window.open(`${API_BASE_URL}/file/${item._id}`, "_blank");
     }
   };
 
@@ -75,7 +76,7 @@ const ItemCard = ({
       case "download":
         if (item.type === "file") {
           window.open(
-            `${import.meta.env.VITE_BACKEND_URL}/file/${item._id}?action=download`,
+            `${API_BASE_URL}/file/${item._id}?action=download`,
             "_blank"
           );
         }

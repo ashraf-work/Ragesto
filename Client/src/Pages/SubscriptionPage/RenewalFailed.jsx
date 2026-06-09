@@ -18,10 +18,10 @@ const RenewalFailed = () => {
               </h3>
               <p className="text-sm text-red-800 leading-relaxed mb-3">
                 We were unable to process your latest subscription renewal
-                payment. Razorpay will automatically retry the payment up to{" "}
-                <span className="font-medium">3 times</span>. If all attempts
-                fail, your subscription will be cancelled, and your premium
-                features will be downgraded.
+                payment. Stripe will automatically retry the payment based on
+                your billing retry settings. If all attempts fail, your
+                subscription will be cancelled, and your premium features will
+                be downgraded.
               </p>
 
               <div className="mt-4 bg-red-100 rounded-md p-3 text-sm text-red-700">

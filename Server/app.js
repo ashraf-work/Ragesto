@@ -39,9 +39,13 @@ export const rootPath = import.meta.dirname;
 
 // Create Express App
 const app = express();
-const allowedOrigins = process.env.CLIENT_URLS.split(",").map((url) =>
-  url.trim()
-);
+const allowedOrigins = (
+  process.env.CLIENT_URLS ||
+  process.env.CLIENT_URL ||
+  "http://localhost:5173"
+)
+  .split(",")
+  .map((url) => url.trim());
 
 // Adding Security Headers
 app.use(
@@ -71,6 +75,7 @@ app.post(
 
 // Middlewares
 app.use("/profilePictures", express.static("profilePictures"));
+app.use("/webhook", webhookRoutes);
 app.use(express.json());
 app.use(cookieParser(secretKey));
 
@@ -97,7 +102,6 @@ app.use("/user", checkAuth, userRoutes);
 app.use("/otp", otpRoutes);
 app.use("/auth", authRoutes);
 app.use("/guest", guestRoutes);
-app.use("/webhook", webhookRoutes);
 app.use("/events", eventController);
 
 // Verify subscription id route

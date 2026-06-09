@@ -53,7 +53,7 @@ export default function CreateFolderModal({ onClose, onCreate, dirId = "" }) {
       } else {
         setError(res.message || "Failed to create folder");
       }
-    } catch (err) {
+    } catch {
       setError("Failed to create folder. Please try again.");
     } finally {
       setIsSubmitting(false);

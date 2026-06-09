@@ -1,7 +1,12 @@
 import { Schema, model } from "mongoose";
 
-const RazorpayWebhookSchema = new Schema(
+const stripeWebhookSchema = new Schema(
   {
+    eventId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     eventType: {
       type: String,
       required: true,
@@ -9,7 +14,6 @@ const RazorpayWebhookSchema = new Schema(
     signature: {
       type: String,
       required: true,
-      unique: true,
     },
     payload: {
       type: Schema.Types.Mixed,
@@ -20,7 +24,11 @@ const RazorpayWebhookSchema = new Schema(
       ref: "User",
       default: null,
     },
-    razorpaySubscriptionId: {
+    stripeSubscriptionId: {
+      type: String,
+      default: null,
+    },
+    stripeCheckoutSessionId: {
       type: String,
       default: null,
     },
@@ -48,6 +56,6 @@ const RazorpayWebhookSchema = new Schema(
   }
 );
 
-const Webhook = model("Webhook", RazorpayWebhookSchema);
+const StripeWebhook = model("StripeWebhook", stripeWebhookSchema);
 
-export default Webhook;
+export default StripeWebhook;

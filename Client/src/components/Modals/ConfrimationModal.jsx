@@ -45,7 +45,7 @@ const ConfirmationModal = ({
       setLoading(true);
       await onConfirm();
       setLoading(false);
-    } catch (err) {
+    } catch {
       setLoading(false);
     }
   };

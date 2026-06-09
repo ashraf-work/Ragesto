@@ -2,40 +2,34 @@ import { ArrowRight, Calendar, Check } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { changePlan } from "../../../Apis/subscriptionApi";
-import { useAuth } from "../../../Contexts/AuthContext";
 import { monthlyPlans, yearlyPlans } from "../Plans";
-import RedirectModal from "../../../components/Modals/RedirectModal";
+import { redirectToStripeCheckout } from "../../../Utils/stripeCheckout";
 
 const PlanEligibleForSwtich = ({ plansEligible, activePlan }) => {
   const [loadingPlanId, setLoadingPlanId] = useState(null);
-  const [showRedirectModal, setShowRedirectModal] = useState(false);
-  const [redirectUrl, setRedirectUrl] = useState("");
-  const { user } = useAuth();
-  const razorpayMode = user?.razorpayMode;
 
   const handleChangePlan = async (planId) => {
     setLoadingPlanId(planId);
-    const res = await changePlan(planId);
-    if (res.success) {
-      const url = `https://payments.ashrafsaleem.me?subscriptionId=${res.data.newSubscriptionId}&userId=${user._id}`;
-      setRedirectUrl(url);
-      setShowRedirectModal(true);
-    } else {
-      toast.error(res.message);
+    try {
+      const res = await changePlan(planId);
+      if (!res?.success) {
+        toast.error(res?.message || "Unable to start Stripe checkout");
+        return;
+      }
+
+      redirectToStripeCheckout({ checkoutUrl: res.data.checkoutUrl });
+    } catch (error) {
+      toast.error(error?.message || "Unable to start Stripe checkout");
+    } finally {
+      setLoadingPlanId(null);
     }
-    setLoadingPlanId(null);
   };
 
   const PlansEligibleForSwitch = useMemo(() => {
     return [...monthlyPlans, ...yearlyPlans].filter((plan) =>
-      plansEligible.includes(plan.id[razorpayMode])
+      plansEligible.includes(plan.id.value)
     );
   }, [plansEligible]);
-
-  const handleCloseModal = () => {
-    setShowRedirectModal(false);
-    setRedirectUrl("");
-  };
 
   return (
     <>
@@ -62,7 +56,7 @@ const PlanEligibleForSwtich = ({ plansEligible, activePlan }) => {
 
               return (
                 <div
-                  key={plan.id[razorpayMode]}
+                  key={plan.id.value}
                   className={`bg-white rounded-lg border transition-all ${
                     isUpgrade
                       ? "border-green-500 shadow-lg"
@@ -109,8 +103,8 @@ const PlanEligibleForSwtich = ({ plansEligible, activePlan }) => {
 
                     {/* Change Button */}
                     <button
-                      onClick={() => handleChangePlan(plan.id[razorpayMode])}
-                      disabled={loadingPlanId === plan.id[razorpayMode]}
+                      onClick={() => handleChangePlan(plan.id.value)}
+                      disabled={loadingPlanId === plan.id.value}
                       className={`w-full py-2.5 px-6 rounded-lg font-medium transition-all text-sm mb-6 flex items-center justify-center gap-2 ${
                         isUpgrade
                           ? "bg-green-600 text-white hover:bg-green-700"
@@ -118,11 +112,11 @@ const PlanEligibleForSwtich = ({ plansEligible, activePlan }) => {
                           ? "bg-orange-600 text-white hover:bg-orange-700"
                           : "bg-blue-600 text-white hover:bg-blue-700"
                       } ${
-                        loadingPlanId === plan.id[razorpayMode] &&
+                        loadingPlanId === plan.id.value &&
                         "opacity-60 cursor-not-allowed"
                       }`}
                     >
-                      {loadingPlanId === plan.id[razorpayMode] ? (
+                      {loadingPlanId === plan.id.value ? (
                         <>
                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                           <span>Processing...</span>
@@ -184,12 +178,6 @@ const PlanEligibleForSwtich = ({ plansEligible, activePlan }) => {
           </div>
         )}
       </div>
-      {/* Redirect Modal */}
-      <RedirectModal
-        isOpen={showRedirectModal}
-        onClose={handleCloseModal}
-        redirectUrl={redirectUrl}
-      />
     </>
   );
 };

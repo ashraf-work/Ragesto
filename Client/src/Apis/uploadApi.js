@@ -174,7 +174,9 @@ const uploadFileMultipart = async (file, dirId, setProgressMap, showModal) => {
     if (uploadData?.data?.uploadId) {
       try {
         await abortUpload(uploadData.data.fileId);
-      } catch {}
+      } catch (abortError) {
+        console.error("Failed to abort multipart upload", abortError);
+      }
     }
 
     showModal(

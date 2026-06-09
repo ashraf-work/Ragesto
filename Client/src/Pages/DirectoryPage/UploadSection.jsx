@@ -50,8 +50,8 @@ Upload didn't start to avoid data loss. Upgrade to a higher plan to upload large
       );
       setProgressMap({});
       setActionDone(true);
-    } catch (err) {
-      console.error("Some uploads failed");
+    } catch (error) {
+      console.error("Some uploads failed", error);
     }
   };
 

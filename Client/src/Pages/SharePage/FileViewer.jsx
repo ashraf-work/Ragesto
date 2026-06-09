@@ -12,6 +12,7 @@ import {
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { renameFileSharedViaEmail } from "../../Apis/shareApi";
+import { API_BASE_URL } from "../../Utils/apiBaseUrl";
 import { formatTime, renderFilePreview } from "../../Utils/helpers";
 import RenameModal from "../DirectoryPage/RenameModal";
 
@@ -19,8 +20,8 @@ export default function FileViewer() {
   const navigate = useNavigate();
   const location = useLocation();
   const [file, setFile] = useState(location.state?.file);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const loading = false;
+  const error = null;
   const [isRenameModal, setIsRenameModal] = useState(false);
   const selfView = location.state?.route;
 
@@ -68,8 +69,8 @@ export default function FileViewer() {
   }
 
   const url = selfView
-    ? `${import.meta.env.VITE_BACKEND_URL}${selfView}?`
-    : `${import.meta.env.VITE_BACKEND_URL}/file/share/access/${file._id}/${
+    ? `${API_BASE_URL}${selfView}?`
+    : `${API_BASE_URL}/file/share/access/${file._id}/${
         file?.isSharedViaLink
           ? `link?token=${file?.shareViaLink?.token}`
           : "email"

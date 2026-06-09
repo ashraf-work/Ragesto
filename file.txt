@@ -1,24 +1,37 @@
-{
-    "Version": "2008-10-17",
-    "Id": "PolicyForCloudFrontPrivateContent",
-    "Statement": [
-        {
-            "Sid": "AllowCloudFrontServicePrincipal",
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "cloudfront.amazonaws.com"
-            },
-            "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::storage-app-new/*",
-            "Condition": {
-                "ArnLike": {
-                    "AWS:SourceArn": [
-                        "arn:aws:cloudfront::618972981535:distribution/E1K4WO3IQN0BT9",
-                        "arn:aws:cloudfront::618972981535:distribution/EEW7DAW236QF2",
-                        "arn:aws:cloudfront::618972981535:distribution/EVJNA4E9AKD3W"
-                    ]
-                }
-            }
-        }
-    ]
-}
+Mere project me abhi Razorpay payment functionality lagi hui hai, lekin mujhe Razorpay completely remove karke Stripe payment gateway integrate karna hai.
+
+Project structure:
+- `Client` folder = Frontend code
+- `Server` folder = Backend code
+
+Tum dono folders ka code carefully check karo aur jahan jahan Razorpay use ho raha hai, usko remove/replace karke Stripe ki full working test payment functionality implement karo.
+
+Requirements:
+1. Razorpay related packages, imports, API routes, controllers, services, frontend logic, scripts, env variables sab remove/replace karo.
+2. Stripe integration same flow ke sath honi chahiye jo Razorpay me thi.
+3. Backend me Stripe payment intent / checkout session ka proper API banao.
+4. Frontend me payment button/checkout flow Stripe ke sath connect karo.
+5. Backend aur frontend dono me required `.env.example` variables add/update karo.
+6. Real Stripe test keys ke liye env variable names use karo, hardcode mat karna.
+7. Payment success/failure handling properly implement karo.
+8. Order/booking/payment status update logic existing Razorpay wali logic ke according Stripe ke sath adjust karo.
+9. Error handling clean aur production-ready honi chahiye.
+10. Code run karke check karo ke frontend aur backend dono error-free hain.
+
+Stripe env variables example:
+Server:
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+CLIENT_URL=
+
+Client:
+VITE_STRIPE_PUBLISHABLE_KEY=
+VITE_API_BASE_URL=
+
+Important:
+- Pehle existing Razorpay flow samjho.
+- Phir Stripe ko same behavior ke sath implement karo.
+- Jo bhi files change karo unka short summary dena.
+- Agar webhook ki zarurat ho to Stripe webhook route bhi bana dena.
+- Mujhe final working setup chahiye jisme test Stripe payment successfully complete ho sake.
+- ager koi cheez phele mujh say pochni hoto phele mujh say confirm karlena or phele mera code samjhna ager koi cheez pochni hoto pochlena.

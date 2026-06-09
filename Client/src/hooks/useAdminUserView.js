@@ -32,7 +32,7 @@ const useAdminUserView = () => {
         showModal("Error", errorMessage, "error");
         navigate("/users");
       }
-    } catch (error) {
+    } catch {
       const errorMessage = "An error occurred while fetching directory";
       setError(errorMessage);
       showModal("Error", errorMessage, "error");

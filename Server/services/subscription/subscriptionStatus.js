@@ -79,7 +79,7 @@ export default async function subscriptionStatus(userId, userDetails) {
           features: planDetails.features,
           cancellationScheduled: false,
           cancellationDate: null,
-          invoiceURL: `${process.env.RAZORPAY_INVOICE_LINK}${subscriptionDoc.invoiceId}`,
+          invoiceURL: subscriptionDoc.invoiceUrl,
         },
         usage: {
           maxFileUploadSize: planDetails.limits.maxFileSize,

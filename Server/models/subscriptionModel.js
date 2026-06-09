@@ -11,10 +11,29 @@ const subscriptionSchema = new Schema(
       type: String,
       required: true,
     },
-    razorpaySubscriptionId: {
+    stripeSubscriptionId: {
       type: String,
-      required: true,
+      default: null,
       unique: true,
+      sparse: true,
+    },
+    stripeCustomerId: {
+      type: String,
+      default: null,
+    },
+    stripeCheckoutSessionId: {
+      type: String,
+      default: null,
+      unique: true,
+      sparse: true,
+    },
+    stripeCheckoutSessionUrl: {
+      type: String,
+      default: null,
+    },
+    stripePriceId: {
+      type: String,
+      default: null,
     },
     status: {
       type: String,
@@ -47,6 +66,10 @@ const subscriptionSchema = new Schema(
       default: null,
     },
     invoiceId: {
+      type: String,
+      default: null,
+    },
+    invoiceUrl: {
       type: String,
       default: null,
     },

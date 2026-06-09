@@ -49,7 +49,7 @@ export default async function changePlan(changePlanId, user) {
     case "upgrade":
     case "cycle-change": {
       result = await upgradeSubscriptionService({
-        userId: user._id,
+        user,
         desirePlan,
       });
       break;
@@ -73,8 +73,8 @@ export default async function changePlan(changePlanId, user) {
   }
 
   return {
-    message: "New subscription created for the selected plan",
+    message: "Stripe checkout session created for the selected plan",
     status: StatusCodes.CREATED,
-    data: { newSubscriptionId: result.newSubscriptionId },
+    data: result,
   };
 }

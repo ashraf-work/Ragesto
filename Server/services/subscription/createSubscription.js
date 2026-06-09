@@ -2,108 +2,60 @@ import { StatusCodes } from "http-status-codes";
 import Subscription from "../../models/subscriptionModel.js";
 import { getPlanDetailsById } from "../../utils/getPlanDetails.js";
 import CustomError from "../../utils/ErrorResponse.js";
-import { razorpayInstance } from "../razorpayService.js";
+import {
+  createStripeCheckoutSession,
+  expireStripeCheckoutSession,
+} from "../stripeService.js";
 
-export default async function createSubscription(userId, planId) {
+export default async function createSubscription(user, planId) {
   const planDetails = getPlanDetailsById(planId);
 
-  // Checking if planId is valid
   if (!planDetails) {
     throw new CustomError("Plan ID is not valid", StatusCodes.BAD_REQUEST);
   }
 
-  const subscriptionDoc = await Subscription.findOne({ userId });
+  const activeSubscription = await Subscription.findOne({
+    userId: user._id,
+    status: "active",
+  }).lean();
 
-  if (subscriptionDoc) {
-    if (subscriptionDoc.status === "active") {
-      throw new CustomError(
-        "You already have an active subscription",
-        StatusCodes.BAD_REQUEST
-      );
-    }
-
-    // planId is same then return the same subscriptionId
-    if (
-      subscriptionDoc.planId === planId &&
-      subscriptionDoc.status === "created"
-    ) {
-      const razorpaySub = await razorpayInstance.subscriptions.fetch(
-        subscriptionDoc.razorpaySubscriptionId
-      );
-      if (razorpaySub.status === "created") {
-        return {
-          status: StatusCodes.CREATED,
-          message: "Subscription already exist in created status.",
-          data: { subscriptionId: subscriptionDoc.razorpaySubscriptionId },
-        };
-      } else {
-        throw new CustomError(
-          "Subscription is not the same as in Database",
-          StatusCodes.INTERNAL_SERVER_ERROR
-        );
-      }
-    }
-
-    // User selected different planId
-    if (
-      subscriptionDoc.planId !== planId &&
-      subscriptionDoc.status === "created"
-    ) {
-      // Cancel the old plan from razorpay.
-      await razorpayInstance.subscriptions.cancel(
-        subscriptionDoc.razorpaySubscriptionId
-      );
-      // keeping the DB status as created because creating new again and updating the document.
-      // also another reason cancelling the subscription will trigger the webhook event. (More explanation in webhook controller)
-
-      // Create new selected plan and update the document
-      const subscription = await razorpayInstance.subscriptions.create({
-        plan_id: planId,
-        total_count: 12,
-        notes: { userId: userId.toString() },
-      });
-
-      await Subscription.findByIdAndUpdate(subscriptionDoc._id, {
-        planId: planId,
-        razorpaySubscriptionId: subscription.id,
-      });
-
-      return {
-        status: StatusCodes.CREATED,
-        message: "Subscription created successfully",
-        data: { subscriptionId: subscription.id },
-      };
-    }
-  }
-
-  const subscription = await razorpayInstance.subscriptions.create({
-    plan_id: planId,
-    total_count: 12,
-    notes: { userId: userId.toString() },
-  });
-
-  if (!subscription) {
+  if (activeSubscription) {
     throw new CustomError(
-      "Failed to create subscription",
-      StatusCodes.INTERNAL_SERVER_ERROR
+      "You already have an active subscription",
+      StatusCodes.BAD_REQUEST
     );
   }
 
-  await Subscription.create({
-    planId: subscription.plan_id,
-    userId,
-    razorpaySubscriptionId: subscription.id,
-    currentPeriodEnd: null,
-    currentPeriodStart: null,
-    endDate: null,
-    startDate: null,
-    invoiceId: null,
+  let subscriptionDoc = await Subscription.findOne({
+    userId: user._id,
     status: "created",
+  });
+
+  if (!subscriptionDoc) {
+    subscriptionDoc = await Subscription.create({
+      planId,
+      userId: user._id,
+      status: "created",
+    });
+  } else {
+    await expireStripeCheckoutSession(subscriptionDoc.stripeCheckoutSessionId);
+    if (subscriptionDoc.planId !== planId) {
+      subscriptionDoc.planId = planId;
+    }
+    subscriptionDoc.stripeCheckoutSessionId = null;
+    subscriptionDoc.stripeCheckoutSessionUrl = null;
+    subscriptionDoc.stripePriceId = null;
+  }
+
+  const session = await createStripeCheckoutSession({
+    user,
+    subscriptionDoc,
+    planDetails,
   });
 
   return {
     status: StatusCodes.CREATED,
-    message: "Subscription created successfully",
-    data: { subscriptionId: subscription.id },
+    message: "Stripe checkout session created successfully",
+    data: session,
   };
 }

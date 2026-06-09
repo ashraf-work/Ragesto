@@ -26,7 +26,10 @@ export const roleSchema = z.enum(["User", "Manager", "Admin", "SuperAdmin"], {
 
 export const planIdSchema = z
   .string()
-  .regex(/^plan_[A-Za-z0-9]{14,20}$/, "Invalid Razorpay plan ID format");
+  .regex(
+    /^(pro|premium)-(monthly|yearly)$/,
+    "Invalid subscription plan ID format"
+  );
 
 export const createSubscriptionSchema = z.object({
   planId: planIdSchema,

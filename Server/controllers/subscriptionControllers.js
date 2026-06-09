@@ -10,9 +10,8 @@ import {
 export const createSubscription = async (req, res, next) => {
   try {
     const { planId } = validateInputs(createSubscriptionSchema, req.body);
-    const userId = req.user._id;
     const { message, status, data } =
-      await SubscriptionServices.CreateSubscription(userId, planId);
+      await SubscriptionServices.CreateSubscription(req.user, planId);
     return CustomSuccess.send(res, message, status, data);
   } catch (error) {
     next(error);
@@ -83,8 +82,11 @@ export const verifySubscriptionId = async (req, res, next) => {
     }
 
     const subscription = await Subscription.findOne({
-      razorpaySubscriptionId: subscriptionId,
       userId,
+      $or: [
+        { stripeSubscriptionId: subscriptionId },
+        { stripeCheckoutSessionId: subscriptionId },
+      ],
     })
       .lean()
       .exec();

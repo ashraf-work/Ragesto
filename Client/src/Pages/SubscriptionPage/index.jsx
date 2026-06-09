@@ -7,6 +7,7 @@ import ActiveSubscription from "./ActiveSubscription";
 import Plans from "./Plans";
 import RenewalFailed from "./RenewalFailed";
 import Loader from "../../components/Loader";
+import { toast } from "sonner";
 
 export default function SubscriptionPage() {
   const [state, setState] = useState({
@@ -47,6 +48,21 @@ export default function SubscriptionPage() {
   }, []);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const paymentStatus = params.get("payment");
+
+    if (paymentStatus === "success") {
+      toast.success(
+        "Payment completed. Your subscription will activate after Stripe confirms it."
+      );
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+
+    if (paymentStatus === "cancelled") {
+      toast.info("Stripe checkout was cancelled.");
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+
     handleSubscriptionStatus();
   }, [handleSubscriptionStatus]);
 
