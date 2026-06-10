@@ -6,5 +6,3 @@ Server/.env
 Server/node_modules/
 Server/storage/
 Server/profilePictures
-
-docs
