@@ -23,10 +23,13 @@ const ActiveSubscription = ({
   const Icon = subscriptionDetails.planName === "Pro" ? Zap : Crown;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
+        <div className="premium-panel mb-8 p-5 sm:p-7">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--primary)] mb-2">
+            Billing workspace
+          </p>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Your Subscription
           </h1>
@@ -38,7 +41,7 @@ const ActiveSubscription = ({
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           {/* Current Plan Card */}
-          <div className="lg:col-span-2 bg-white rounded-lg border border-gray-200 p-6">
+          <div className="lg:col-span-2 premium-card p-6">
             <div className="flex items-start justify-between mb-6">
               <div className="flex-1">
                 <div className="inline-flex items-center gap-2 bg-green-50 px-3 py-1 rounded-full mb-3">
@@ -60,7 +63,7 @@ const ActiveSubscription = ({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
+              <div className="bg-[var(--surface-soft)] rounded-xl p-4 border border-[var(--border)]">
                 <div className="flex items-center gap-2 mb-2">
                   <Calendar className="w-4 h-4 text-gray-500" />
                   <p className="text-xs text-gray-500 font-medium">
@@ -80,7 +83,7 @@ const ActiveSubscription = ({
                   in {subscriptionDetails.daysUntilRenewal} days
                 </p>
               </div>
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
+              <div className="bg-[var(--surface-soft)] rounded-xl p-4 border border-[var(--border)]">
                 <div className="flex items-center gap-2 mb-2">
                   <CreditCard className="w-4 h-4 text-gray-500" />
                   <p className="text-xs text-gray-500 font-medium">
@@ -100,7 +103,7 @@ const ActiveSubscription = ({
 
             <div className="flex flex-wrap gap-2">
               <button
-                className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 text-sm font-medium rounded-xl premium-button-primary"
                 onClick={() => navigate("/plans/change-plan")}
               >
                 Change Plan
@@ -118,7 +121,7 @@ const ActiveSubscription = ({
           </div>
 
           {/* Storage Usage Card */}
-          <div className="bg-white rounded-lg border border-gray-200  p-6">
+          <div className="premium-card p-6">
             <div className="flex items-center gap-2 mb-4">
               <HardDrive className="w-5 h-5 text-gray-700" />
               <h3 className="text-base font-semibold text-gray-900">
@@ -134,9 +137,9 @@ const ActiveSubscription = ({
                   of {formatFileSize(userUsage.storageTotal)}
                 </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-[var(--primary-soft)] rounded-full h-2 overflow-hidden">
                 <div
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-500"
+                  className="bg-gradient-to-r from-blue-500 to-teal-500 h-2 rounded-full transition-all duration-500"
                   style={{ width: `${userUsage.storagePercentage}%` }}
                 ></div>
               </div>
@@ -161,7 +164,7 @@ const ActiveSubscription = ({
                   </span>
                 </div>
               </div>
-              <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+              <div className="bg-[var(--surface-soft)] rounded-xl p-3 border border-[var(--border)]">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs text-gray-500 font-medium">
                     Max File Size
@@ -177,7 +180,7 @@ const ActiveSubscription = ({
         </div>
 
         {/* Info Banner */}
-        <div className="mb-6 bg-blue-50 rounded-lg border border-blue-200 p-4">
+        <div className="mb-6 rounded-2xl border border-blue-200 bg-[var(--surface-blue)] p-4">
           <p className="text-sm text-blue-900 flex gap-2">
             <svg
               className="w-5 h-5 flex-shrink-0 mt-0.5"
@@ -200,7 +203,7 @@ const ActiveSubscription = ({
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-lg border border-gray-200  p-5">
+          <div className="premium-card p-5">
             <div className="flex items-center justify-between mb-3">
               <div className="bg-blue-50 p-2 rounded-lg">
                 <FileText className="w-5 h-5 text-blue-600" />
@@ -212,7 +215,7 @@ const ActiveSubscription = ({
             <p className="text-sm text-gray-600">Total Files</p>
           </div>
 
-          <div className="bg-white rounded-lg border border-gray-200  p-5">
+          <div className="premium-card p-5">
             <div className="flex items-center justify-between mb-3">
               <div className="bg-green-50 p-2 rounded-lg">
                 <Share2 className="w-5 h-5 text-green-600" />
@@ -224,7 +227,7 @@ const ActiveSubscription = ({
             <p className="text-sm text-gray-600">Shared Files</p>
           </div>
 
-          <div className="bg-white rounded-lg border border-gray-200  p-5">
+          <div className="premium-card p-5">
             <div className="flex items-center justify-between mb-3">
               <div className="bg-purple-50 p-2 rounded-lg">
                 <Users className="w-5 h-5 text-purple-600" />
@@ -236,7 +239,7 @@ const ActiveSubscription = ({
             <p className="text-sm text-gray-600">Devices Connected</p>
           </div>
 
-          <div className="bg-white rounded-lg border border-gray-200  p-5">
+          <div className="premium-card p-5">
             <div className="flex items-center justify-between mb-3">
               <div className="bg-orange-50 p-2 rounded-lg">
                 <Upload className="w-5 h-5 text-orange-600" />
@@ -252,7 +255,7 @@ const ActiveSubscription = ({
         </div>
 
         {/* Plan Features */}
-        <div className="bg-white rounded-lg border border-gray-200  p-6">
+        <div className="premium-card p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-5">
             Your Plan Includes
           </h3>
@@ -275,7 +278,7 @@ const ActiveSubscription = ({
                 Want more storage and features?
               </p>
               <button
-                className="px-5 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-5 py-2 text-white text-sm font-medium rounded-xl premium-button-primary"
                 onClick={() => navigate("/plans/change-plan")}
               >
                 Upgrade to Premium

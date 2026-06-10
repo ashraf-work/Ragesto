@@ -150,45 +150,54 @@ const Plans = ({ hasActivePlan }) => {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen py-10 sm:py-14 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-3">
-              Choose Your Perfect Plan
+          <div className="premium-panel mb-10 p-6 sm:p-8 lg:p-10">
+            <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--primary)] mb-3">
+                  Ragesto plans
+                </p>
+                <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3 max-w-2xl">
+                  Choose storage that grows with your work
             </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Secure, reliable cloud storage for everyone. Start free, upgrade
-              anytime.
+                <p className="text-base sm:text-lg text-gray-600 max-w-2xl">
+                  Clear limits, secure sharing, and predictable billing for personal
+                  files, teams, and heavier media workflows.
             </p>
+              </div>
 
             {/* Billing Toggle */}
-            <div className="mt-8 inline-flex items-center bg-white rounded-lg p-1  border border-gray-200">
+              <div className="lg:justify-self-end">
+                <div className="inline-flex items-center rounded-full p-1 border border-[var(--border)] bg-[var(--surface-soft)] shadow-sm">
               <button
                 onClick={() => setBillingCycle("monthly")}
-                className={`px-6 py-2 rounded-md text-sm font-medium transition-all ${
+                    className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
                   billingCycle === "monthly"
-                    ? "bg-blue-600 text-white "
-                    : "text-gray-600 hover:text-gray-900"
+                        ? "bg-[var(--primary)] text-white shadow-sm"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-[var(--surface-blue)]"
                 }`}
               >
                 Monthly
               </button>
               <button
                 onClick={() => setBillingCycle("yearly")}
-                className={`px-6 py-2 rounded-md text-sm font-medium transition-all ${
+                    className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
                   billingCycle === "yearly"
-                    ? "bg-blue-600 text-white "
-                    : "text-gray-600 hover:text-gray-900"
+                        ? "bg-[var(--primary)] text-white shadow-sm"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-[var(--surface-blue)]"
                 }`}
               >
                 Yearly
               </button>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Plans Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 max-w-6xl mx-auto mb-12">
             {currentPlans.map((plan) => {
               const Icon = plan.icon;
               const isYearly = billingCycle === "yearly";
@@ -198,22 +207,22 @@ const Plans = ({ hasActivePlan }) => {
               return (
                 <div
                   key={plan.id.value}
-                  className={`relative bg-white rounded-lg border  overflow-hidden transition-all ${
+                  className={`relative premium-card overflow-hidden ${
                     plan.popular
-                      ? "border-blue-500 ring-2 ring-blue-500"
+                      ? "ring-2 ring-blue-200"
                       : isCurrentPlan
-                      ? "border-green-500 ring-2 ring-green-500"
-                      : "border-gray-200"
+                      ? "ring-2 ring-emerald-200"
+                      : ""
                   }`}
                 >
                   {plan.popular && (
-                    <div className="absolute top-0 right-0 bg-blue-600 text-white px-3 py-1 text-xs font-semibold rounded-bl-lg">
+                    <div className="absolute top-0 right-0 bg-[var(--primary)] text-white px-3 py-1 text-xs font-semibold rounded-bl-xl">
                       MOST POPULAR
                     </div>
                   )}
 
                   {isCurrentPlan && (
-                    <div className="absolute top-0 right-0 bg-green-600 text-white px-3 py-1 text-xs font-semibold rounded-bl-lg flex items-center gap-1">
+                    <div className="absolute top-0 right-0 bg-[var(--success)] text-white px-3 py-1 text-xs font-semibold rounded-bl-xl flex items-center gap-1">
                       <Check className="w-3 h-3" />
                       CURRENT PLAN
                     </div>
@@ -253,7 +262,7 @@ const Plans = ({ hasActivePlan }) => {
                     </div>
 
                     {/* Price */}
-                    <div className="mb-6 pb-6 border-b border-gray-200">
+                    <div className="mb-6 pb-6 border-b border-[var(--border)]">
                       {plan.price === 0 ? (
                         <div className="flex items-baseline">
                           <span className="text-3xl font-bold text-gray-900">
@@ -291,12 +300,12 @@ const Plans = ({ hasActivePlan }) => {
                       disabled={
                         loadingPlanId === plan.id.value || isCurrentPlan
                       }
-                      className={`w-full py-2.5 px-6 rounded-lg font-medium transition-all text-sm mb-6 ${
+                      className={`w-full py-2.5 px-6 rounded-xl font-medium transition-all text-sm mb-6 ${
                         isCurrentPlan
-                          ? "bg-green-600 text-white cursor-default"
+                          ? "bg-[var(--success)] text-white cursor-default"
                           : plan.popular
-                          ? "bg-blue-600 text-white hover:bg-blue-700 "
-                          : "bg-gray-900 text-white hover:bg-gray-800 "
+                          ? "premium-button-primary"
+                          : "premium-button-secondary"
                       } ${
                         loadingPlanId === plan.id.value &&
                         "opacity-60 cursor-not-allowed"
@@ -344,7 +353,7 @@ const Plans = ({ hasActivePlan }) => {
           {/* Footer Note */}
           <div className="text-center mt-8">
             <p className="text-sm text-gray-500">
-              All plans include automatic backups and can be cancelled anytime
+              Secure Stripe billing, automatic backups, and cancellation anytime.
             </p>
           </div>
         </div>

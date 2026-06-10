@@ -20,11 +20,11 @@ const Modal = ({ isOpen, onClose, title, children, type = "info" }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-slate-900/30 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-lg p-6 max-w-md w-full"
+        className="premium-panel p-6 max-w-md w-full"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
@@ -34,7 +34,7 @@ const Modal = ({ isOpen, onClose, title, children, type = "info" }) => {
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 hover:text-gray-600 rounded-full p-1 hover:bg-[var(--surface-blue)]"
           >
             <X size={20} />
           </button>
@@ -43,7 +43,7 @@ const Modal = ({ isOpen, onClose, title, children, type = "info" }) => {
         <div className="flex justify-end space-x-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+            className="px-4 py-2 rounded-xl premium-button-secondary"
           >
             Close
           </button>

@@ -72,15 +72,15 @@ export default function CreateFolderModal({ onClose, onCreate, dirId = "" }) {
 
   return (
     <div
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200"
+      className="fixed inset-0 bg-slate-900/35 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-xl shadow-2xl w-full max-w-md transform animate-in zoom-in-95 duration-200"
+        className="premium-panel w-full max-w-md transform animate-in zoom-in-95 duration-200 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-[var(--border)]">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-blue-50 rounded-lg">
               <FolderPlus className="w-5 h-5 text-blue-600" />
@@ -97,7 +97,7 @@ export default function CreateFolderModal({ onClose, onCreate, dirId = "" }) {
           <button
             onClick={onClose}
             disabled={isSubmitting}
-            className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg p-1.5 transition-colors disabled:opacity-50"
+            className="text-gray-400 hover:text-gray-600 hover:bg-[var(--surface-blue)] rounded-lg p-1.5 transition-colors disabled:opacity-50"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
@@ -121,12 +121,12 @@ export default function CreateFolderModal({ onClose, onCreate, dirId = "" }) {
                   setTouchedInput(true);
                 }}
                 onBlur={() => setTouchedInput(true)}
-                className={`w-full px-3 py-2.5 pr-10 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                className={`w-full px-3 py-2.5 pr-10 rounded-xl premium-input focus:outline-none transition-all ${
                   showError
-                    ? "border-red-300 focus:ring-red-500 focus:border-red-500"
+                    ? "border-red-300"
                     : showSuccess
-                    ? "border-green-300 focus:ring-green-500 focus:border-green-500"
-                    : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                    ? "border-green-300"
+                    : ""
                 } disabled:bg-gray-50 disabled:cursor-not-allowed`}
                 placeholder="e.g., Documents, Projects, Photos"
                 disabled={isSubmitting}

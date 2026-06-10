@@ -536,11 +536,19 @@ const importFileFromGoogleService = async (
   fileForUploading,
   filesMetaData,
   token,
+  reportProgress = () => {},
 ) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
+    reportProgress({
+      status: "running",
+      phase: "validating",
+      percent: 4,
+      message: "Checking storage and file limits",
+    });
+
     const userRootDir = await Directory.findById(rootDirId)
       .select("size path")
       .session(session)
@@ -583,6 +591,13 @@ Upload stopped to avoid data loss. Upgrade to upload bigger files.`,
       );
     }
 
+    reportProgress({
+      status: "running",
+      phase: "preparing",
+      percent: 12,
+      message: "Preparing Google Drive folder",
+    });
+
     let googleRootDir = await Directory.findOne({
       name: "Google Drive",
       userId,
@@ -606,18 +621,23 @@ Upload stopped to avoid data loss. Upgrade to upload bigger files.`,
     }
 
     const file = fileForUploading;
+    const id = file.id;
     const originalName = file.name || id;
-
     const isGoogleNative = file.mimeType?.startsWith(
       "application/vnd.google-apps",
     );
-    const id = file.id;
     const fileId = new mongoose.Types.ObjectId();
     const ext = getFileExtension(originalName, file.mimeType);
 
     const downloadUrl = isGoogleNative
       ? `https://www.googleapis.com/drive/v3/files/${id}/export?mimeType=${getExportMimeType(file.mimeType)}&supportsAllDrives=true`
       : `https://www.googleapis.com/drive/v3/files/${id}?alt=media&supportsAllDrives=true`;
+
+    const toPercent = (start, end, progress) => {
+      if (!progress?.total) return start;
+      const ratio = Math.max(0, Math.min(1, progress.loaded / progress.total));
+      return Math.round(start + (end - start) * ratio);
+    };
 
     const uploads = [
       fetchAndUpload({
@@ -626,6 +646,21 @@ Upload stopped to avoid data loss. Upgrade to upload bigger files.`,
         key: `${fileId}${ext}`,
         bucket: process.env.AWS_BUCKET,
         contentType: file.mimeType,
+        onProgress: (progress) => {
+          const isDownload = progress.stage === "download";
+          reportProgress({
+            status: "running",
+            phase: isDownload ? "downloading" : "uploading",
+            percent: isDownload
+              ? toPercent(15, 55, progress)
+              : toPercent(56, 88, progress),
+            loaded: progress.loaded,
+            total: progress.total,
+            message: isDownload
+              ? "Downloading from Google Drive"
+              : "Uploading to secure storage",
+          });
+        },
       }),
     ];
 
@@ -637,6 +672,21 @@ Upload stopped to avoid data loss. Upgrade to upload bigger files.`,
           key: `${fileId}.pdf`,
           bucket: process.env.AWS_BUCKET,
           contentType: "application/pdf",
+          onProgress: (progress) => {
+            const isDownload = progress.stage === "download";
+            reportProgress({
+              status: "running",
+              phase: isDownload ? "exporting" : "uploading",
+              percent: isDownload
+                ? toPercent(62, 74, progress)
+                : toPercent(75, 90, progress),
+              loaded: progress.loaded,
+              total: progress.total,
+              message: isDownload
+                ? "Exporting Google document preview"
+                : "Uploading preview copy",
+            });
+          },
         }),
       );
     }
@@ -651,6 +701,13 @@ Upload stopped to avoid data loss. Upgrade to upload bigger files.`,
     const finalName = originalName.includes(".")
       ? originalName
       : originalName + ext;
+
+    reportProgress({
+      status: "running",
+      phase: "saving",
+      percent: 94,
+      message: "Saving file metadata",
+    });
 
     await File.create(
       [
@@ -679,6 +736,13 @@ Upload stopped to avoid data loss. Upgrade to upload bigger files.`,
 
     await session.commitTransaction();
     session.endSession();
+
+    reportProgress({
+      status: "running",
+      phase: "finalizing",
+      percent: 98,
+      message: "Finalizing import",
+    });
 
     return {
       id,

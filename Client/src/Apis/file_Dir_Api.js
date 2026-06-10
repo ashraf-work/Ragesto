@@ -44,12 +44,18 @@ export const createDirectory = async (dirId, directoryName) => {
   }
 };
 
-export const driveConnect = async ({ token, filesMetaData, fileForUploading }) => {
+export const driveConnect = async ({
+  token,
+  filesMetaData,
+  fileForUploading,
+  importJobId,
+}) => {
   try {
     const response = await axios.post("/file/drive-import", {
       token,
       filesMetaData,
       fileForUploading,
+      importJobId,
     });
     return response.data;
   } catch (error) {

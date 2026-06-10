@@ -34,9 +34,9 @@ const UserTable = ({
   }, [users, filter]);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div className="premium-panel overflow-hidden">
       {/* Table Header */}
-      <div className="bg-gray-50 px-4 sm:px-6 py-4 border-b border-gray-200">
+      <div className="bg-[rgba(239,246,255,0.5)] px-4 sm:px-6 py-4 border-b border-[var(--border)]">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">
@@ -59,7 +59,7 @@ const UserTable = ({
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors appearance-none pr-8"
+                className="premium-input inline-flex items-center px-4 py-2 text-sm font-medium rounded-xl focus:outline-none appearance-none pr-8"
               >
                 <option value="all">All Users</option>
                 <option value="active">Active Users</option>
@@ -86,7 +86,7 @@ const UserTable = ({
             {/* Refresh Button */}
             <button
               onClick={fetchUsers}
-              className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors w-fit"
+              className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-xl premium-button-secondary w-fit"
             >
               <svg
                 className="w-4 h-4 mr-2"
@@ -112,8 +112,8 @@ const UserTable = ({
         <EmptyState />
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-[var(--border)]">
+            <thead className="bg-[var(--surface-soft)]">
               <tr>
                 <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Name
@@ -132,7 +132,7 @@ const UserTable = ({
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-[var(--surface)] divide-y divide-[var(--border)]">
               {filteredUsers.map((user) => (
                 <UserTableRow
                   key={user.id}

@@ -16,6 +16,7 @@ import {
   shareViaEmailSchema,
 } from "../validators/fileSchema.js";
 import CustomError from "../utils/ErrorResponse.js";
+import { sendEventToUser } from "./EventController.js";
 
 // export const uploadFile = async (req, res, next) => {
 //   const file = req.file;
@@ -497,7 +498,7 @@ export const renameFileSharedViaLink = async (req, res, next) => {
 
 export const importFromDrive = async (req, res, next) => {
   const { rootDirId, _id, maxStorageLimit } = req.user;
-  const { token, filesMetaData, fileForUploading } = req.body;
+  const { token, filesMetaData, fileForUploading, importJobId } = req.body;
   if (
     !token ||
     !Array.isArray(filesMetaData) ||
@@ -507,19 +508,50 @@ export const importFromDrive = async (req, res, next) => {
     throw new CustomError("Invalid input data", StatusCodes.BAD_REQUEST);
 
   try {
+    const reportProgress = (progress) => {
+      if (!importJobId) return;
+      sendEventToUser(_id.toString(), {
+        type: "driveImportProgress",
+        importJobId,
+        fileId: fileForUploading.id,
+        fileName: fileForUploading.name,
+        ...progress,
+      });
+    };
+
     const result = await FileServices.ImportFileFromGoogleService(
       rootDirId,
       maxStorageLimit,
       _id,
       fileForUploading,
       filesMetaData,
-      token
+      token,
+      reportProgress
     );
+
+    reportProgress({
+      status: "complete",
+      phase: "complete",
+      percent: 100,
+      message: "Import complete",
+    });
 
     return CustomSuccess.send(res, null, StatusCodes.CREATED, {
       result,
     });
   } catch (error) {
+    if (importJobId) {
+      sendEventToUser(_id.toString(), {
+        type: "driveImportProgress",
+        importJobId,
+        fileId: fileForUploading?.id,
+        fileName: fileForUploading?.name,
+        status: "error",
+        phase: "error",
+        percent: 100,
+        message: error.message || "Drive import failed",
+      });
+    }
     next(error);
   }
 };

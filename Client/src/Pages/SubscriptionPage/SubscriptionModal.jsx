@@ -55,7 +55,7 @@ const SubscriptionCancelModal = ({
       <button
         className={
           buttonClassName ||
-          "px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+          "px-4 py-2 text-sm font-medium rounded-xl premium-button-secondary"
         }
         onClick={handleOpenModal}
       >
@@ -72,7 +72,7 @@ const SubscriptionCancelModal = ({
           />
 
           {/* Modal Content */}
-          <div className="relative bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] flex flex-col animate-fade-in">
+          <div className="relative premium-panel max-w-lg w-full max-h-[90vh] flex flex-col animate-fade-in overflow-hidden">
             {/* Header - Fixed */}
             <div className="flex items-start justify-between p-6 pb-4 border-b border-gray-200 flex-shrink-0">
               <div className="flex items-center">
@@ -177,7 +177,7 @@ const SubscriptionCancelModal = ({
                 </div>
 
                 {/* Free Plan Limits */}
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <div className="bg-[var(--surface-soft)] border border-[var(--border)] rounded-xl p-4">
                   <p className="text-sm font-medium text-gray-900 mb-3">
                     Free Plan Limits:
                   </p>
@@ -210,7 +210,7 @@ const SubscriptionCancelModal = ({
               <button
                 onClick={handleCloseModal}
                 disabled={isLoading}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-sm font-medium rounded-xl premium-button-secondary disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Keep Subscription
               </button>

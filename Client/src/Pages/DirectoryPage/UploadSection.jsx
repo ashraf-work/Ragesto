@@ -83,7 +83,7 @@ Upload didn't start to avoid data loss. Upgrade to a higher plan to upload large
           {Object.entries(progressMap).map(([fileName, progress]) => (
             <div
               key={fileName}
-              className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4 shadow-sm hover:shadow-md transition-shadow duration-200"
+              className="premium-card p-3 sm:p-4"
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs sm:text-sm font-medium text-gray-800 truncate flex-1 mr-2">
@@ -93,9 +93,9 @@ Upload didn't start to avoid data loss. Upgrade to a higher plan to upload large
                   {progress}%
                 </span>
               </div>
-              <div className="w-full bg-gray-100 rounded-full h-2 sm:h-2.5 overflow-hidden">
+              <div className="w-full bg-[var(--primary-soft)] rounded-full h-2 sm:h-2.5 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 sm:h-2.5 rounded-full transition-all duration-500 ease-out"
+                  className="bg-gradient-to-r from-blue-500 to-teal-500 h-2 sm:h-2.5 rounded-full transition-all duration-500 ease-out"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -106,19 +106,21 @@ Upload didn't start to avoid data loss. Upgrade to a higher plan to upload large
 
       {/* Desktop Upload Area - Hidden on mobile */}
       <div
-        className={`hidden min-[800px]:block max-w-7xl mx-auto mb-4 border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-          dragOver ? "border-blue-400 bg-blue-50" : "border-gray-300 bg-white"
+        className={`hidden min-[800px]:block max-w-7xl mx-auto mb-5 border border-dashed rounded-[24px] p-8 text-center transition-all duration-200 ${
+          dragOver ? "border-blue-400 bg-blue-50 shadow-lg" : "border-[var(--border-strong)] bg-[rgba(253,254,255,0.72)]"
         }`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
       >
-        <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--surface-blue)]">
+          <Upload className="w-7 h-7 text-[var(--primary)]" />
+        </div>
         <h2 className="text-xl font-semibold text-gray-900 mb-2">
-          Upload Files or Create Directory
+          Build your cloud workspace
         </h2>
         <p className="text-gray-600 mb-4">
-          Drag and drop files here, or click to select files
+          Drop files here, import from Drive, or create a clean folder structure.
         </p>
 
         {/* Action Buttons */}
@@ -129,7 +131,7 @@ Upload didn't start to avoid data loss. Upgrade to a higher plan to upload large
               ${
                 active || Object.keys(progressMap).length > 0
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed shadow-none"
-                  : "text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 cursor-pointer focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 hover:shadow-xl transform hover:-translate-y-0.5"
+                  : "premium-button-primary cursor-pointer focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2"
               }
             `}
           >
@@ -155,7 +157,7 @@ Upload didn't start to avoid data loss. Upgrade to a higher plan to upload large
           {/* Create Directory Button */}
           <button
             onClick={() => setShowCreateModal(true)}
-            className="group relative inline-flex items-center justify-center w-full sm:w-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-sm font-semibold text-white bg-gradient-to-r from-green-600 to-green-700 rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 min-h-[48px] sm:min-w-[140px] lg:min-w-[160px] touch-manipulation"
+            className="group relative inline-flex items-center justify-center w-full sm:w-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-sm font-semibold rounded-xl premium-button-secondary focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 min-h-[48px] sm:min-w-[140px] lg:min-w-[160px] touch-manipulation"
           >
             <FolderPlus className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 transition-transform group-hover:scale-110 flex-shrink-0" />
             <span className="truncate">Create Directory</span>
@@ -172,7 +174,7 @@ Upload didn't start to avoid data loss. Upgrade to a higher plan to upload large
       </div>
 
       {/* Mobile FAB - Fixed Bottom Action Bar */}
-      <div className="min-[800px]:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+      <div className="min-[800px]:hidden fixed bottom-0 left-0 right-0 bg-[rgba(253,254,255,0.92)] backdrop-blur-xl border-t border-[var(--border)] shadow-lg z-50">
         <div className="flex items-center justify-between p-3 max-w-lg mx-auto">
           {/* Upload Files */}
           <label className="flex flex-col items-center gap-1 flex-1 touch-manipulation active:scale-95 transition-transform cursor-pointer">

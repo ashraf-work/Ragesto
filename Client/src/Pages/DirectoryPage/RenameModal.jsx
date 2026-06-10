@@ -73,15 +73,15 @@ export default function RenameModal({
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-slate-900/35 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-lg shadow-xl w-full max-w-md"
+        className="premium-panel w-full max-w-md overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
+        <div className="flex items-center justify-between p-6 border-b border-[var(--border)]">
           <div className="flex items-center space-x-3">
             {item.type === "file" ? (
               <File className="w-5 h-5 text-blue-600" />
@@ -92,7 +92,7 @@ export default function RenameModal({
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 hover:text-gray-600 rounded-full p-1 hover:bg-[var(--surface-blue)]"
           >
             <X className="w-5 h-5" />
           </button>
@@ -109,14 +109,14 @@ export default function RenameModal({
               type="text"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent ${
+              className={`w-full px-3 py-2 rounded-xl premium-input focus:outline-none ${
                 isEmpty
-                  ? "border-red-300 focus:ring-red-500"
+                  ? "border-red-300"
                   : extensionChanged
-                  ? "border-red-300 focus:ring-red-500"
+                  ? "border-red-300"
                   : isSameName
-                  ? "border-yellow-300 focus:ring-yellow-500"
-                  : "border-gray-300 focus:ring-blue-500"
+                  ? "border-yellow-300"
+                  : ""
               }`}
               placeholder={`Enter new ${item.type} name`}
               disabled={isSubmitting}
@@ -141,18 +141,18 @@ export default function RenameModal({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end space-x-3 p-6 bg-gray-50 rounded-b-lg">
+        <div className="flex justify-end space-x-3 p-6 bg-[var(--surface-soft)] border-t border-[var(--border)]">
           <button
             onClick={onClose}
             disabled={isSubmitting}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium rounded-xl premium-button-secondary disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={handleRename}
             disabled={!isValid || isSubmitting || extensionChanged}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
+            className="px-4 py-2 text-sm font-medium text-white rounded-xl premium-button-primary disabled:opacity-50 flex items-center space-x-2"
           >
             {isSubmitting ? (
               <>

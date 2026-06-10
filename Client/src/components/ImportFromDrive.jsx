@@ -5,6 +5,8 @@ import { useModal } from "../Contexts/ModalContext";
 import { useGlobalProgress } from "../Contexts/ProgressContext";
 import { driveConnect } from "../Apis/file_Dir_Api";
 import { FaGoogleDrive } from "react-icons/fa";
+import { API_BASE_URL } from "../Utils/apiBaseUrl";
+import { useAuth } from "../Contexts/AuthContext";
 
 export default function ImportFromDrive({
   setActionDone,
@@ -13,7 +15,9 @@ export default function ImportFromDrive({
 }) {
   const navigate = useNavigate();
   const { showModal } = useModal();
-  const { start, step, finish, reset, active } = useGlobalProgress();
+  const { start, step, finish, reset, active, updateCurrent } =
+    useGlobalProgress();
+  const { user } = useAuth();
   const [openPicker] = useDrivePicker();
 
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -48,21 +52,53 @@ export default function ImportFromDrive({
     if (!data?.docs?.length) return;
 
     const files = data.docs;
+    const source = createDriveProgressSource({
+      userId: user?._id,
+      onProgress: (event) => {
+        updateCurrent({
+          percent: event.percent,
+          currentFileName: event.fileName,
+          message: event.message,
+        });
+      },
+    });
 
     try {
-      start(files.length);
+      start(files.length, { message: "Preparing Google Drive import" });
       for (const f of files) {
+        const importJobId = createImportJobId();
+        source.track(importJobId);
+        updateCurrent({
+          percent: 0,
+          currentFileName: f.name,
+          message: "Starting Google Drive import",
+        });
+        const stopFallback = startFallbackProgress({
+          fileName: f.name,
+          updateCurrent,
+          source,
+          importJobId,
+        });
+
         const res = await driveConnect({
           token,
           filesMetaData: files,
           fileForUploading: f,
+          importJobId,
         });
+        stopFallback();
+        source.untrack(importJobId);
 
         if (!res.success) {
           reset();
           showModal("Error", res.message, "error");
           return;
         }
+        updateCurrent({
+          percent: 100,
+          currentFileName: f.name,
+          message: "Import complete",
+        });
         step(1);
       }
 
@@ -73,6 +109,8 @@ export default function ImportFromDrive({
       reset();
       console.error("Drive import failed", error);
       showModal("Error", "Drive import failed.", "error");
+    } finally {
+      source.close();
     }
   }
 
@@ -116,6 +154,88 @@ export default function ImportFromDrive({
       </button>
     </div>
   );
+}
+
+function createImportJobId() {
+  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+  return `drive-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function createDriveProgressSource({ userId, onProgress }) {
+  const trackedJobs = new Set();
+  const jobsWithProgress = new Set();
+  let connected = false;
+  let eventSource = null;
+
+  if (userId && typeof EventSource !== "undefined") {
+    const baseUrl = API_BASE_URL || window.location.origin;
+    eventSource = new EventSource(
+      `${baseUrl}/events?userId=${encodeURIComponent(userId)}`
+    );
+
+    eventSource.onopen = () => {
+      connected = true;
+    };
+
+    eventSource.onerror = () => {
+      connected = false;
+    };
+
+    eventSource.onmessage = (message) => {
+      try {
+        const event = JSON.parse(message.data);
+        if (
+          event.type === "driveImportProgress" &&
+          trackedJobs.has(event.importJobId)
+        ) {
+          connected = true;
+          if (
+            event.total > 0 ||
+            ["saving", "finalizing"].includes(event.phase) ||
+            ["complete", "error"].includes(event.status)
+          ) {
+            jobsWithProgress.add(event.importJobId);
+          }
+          onProgress(event);
+        }
+      } catch (error) {
+        console.error("Invalid drive import progress event", error);
+      }
+    };
+  }
+
+  return {
+    track: (jobId) => trackedJobs.add(jobId),
+    untrack: (jobId) => {
+      trackedJobs.delete(jobId);
+      jobsWithProgress.delete(jobId);
+    },
+    isConnected: () => connected,
+    hasProgress: (jobId) => jobsWithProgress.has(jobId),
+    close: () => eventSource?.close(),
+  };
+}
+
+function startFallbackProgress({ fileName, updateCurrent, source, importJobId }) {
+  let percent = 2;
+  let tick = 0;
+  const intervalId = setInterval(() => {
+    if (source.hasProgress(importJobId)) return;
+    tick += 1;
+    const ceiling = tick < 8 ? 45 : tick < 18 ? 76 : 91;
+    percent = Math.min(
+      ceiling,
+      percent + Math.max(1, Math.round((ceiling - percent) * 0.18))
+    );
+    updateCurrent({
+      percent,
+      currentFileName: fileName,
+      message: "Importing from Google Drive",
+      importJobId,
+    });
+  }, 700);
+
+  return () => clearInterval(intervalId);
 }
 
 // ---- GOOGLE TOKEN ----

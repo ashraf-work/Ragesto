@@ -34,7 +34,10 @@ const PlanEligibleForSwtich = ({ plansEligible, activePlan }) => {
   return (
     <>
       <div>
-        <div className="mb-6">
+        <div className="premium-panel mb-6 p-5 sm:p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--primary)] mb-2">
+            Plan switch
+          </p>
           <h3 className="text-xl font-bold text-gray-900">
             Available Plans to Switch To
           </h3>
@@ -57,12 +60,12 @@ const PlanEligibleForSwtich = ({ plansEligible, activePlan }) => {
               return (
                 <div
                   key={plan.id.value}
-                  className={`bg-white rounded-lg border transition-all ${
+                  className={`premium-card overflow-hidden ${
                     isUpgrade
-                      ? "border-green-500 shadow-lg"
+                      ? "ring-2 ring-emerald-200"
                       : isDowngrade
-                      ? "border-orange-300"
-                      : "border-blue-400"
+                      ? "ring-2 ring-amber-200"
+                      : ""
                   }`}
                 >
                   <div className="p-6">
@@ -80,7 +83,7 @@ const PlanEligibleForSwtich = ({ plansEligible, activePlan }) => {
                     </div>
 
                     {/* Price */}
-                    <div className="mb-6 pb-6 border-b border-gray-200">
+                    <div className="mb-6 pb-6 border-b border-[var(--border)]">
                       {plan.price === 0 ? (
                         <div className="flex items-baseline">
                           <span className="text-2xl font-bold text-gray-900">
@@ -105,12 +108,12 @@ const PlanEligibleForSwtich = ({ plansEligible, activePlan }) => {
                     <button
                       onClick={() => handleChangePlan(plan.id.value)}
                       disabled={loadingPlanId === plan.id.value}
-                      className={`w-full py-2.5 px-6 rounded-lg font-medium transition-all text-sm mb-6 flex items-center justify-center gap-2 ${
+                      className={`w-full py-2.5 px-6 rounded-xl font-medium transition-all text-sm mb-6 flex items-center justify-center gap-2 ${
                         isUpgrade
-                          ? "bg-green-600 text-white hover:bg-green-700"
-                          : isDowngrade
-                          ? "bg-orange-600 text-white hover:bg-orange-700"
-                          : "bg-blue-600 text-white hover:bg-blue-700"
+                          ? "bg-[var(--success)] text-white hover:brightness-95"
+                        : isDowngrade
+                          ? "bg-[var(--warning)] text-white hover:brightness-95"
+                          : "premium-button-primary"
                       } ${
                         loadingPlanId === plan.id.value &&
                         "opacity-60 cursor-not-allowed"
@@ -164,7 +167,7 @@ const PlanEligibleForSwtich = ({ plansEligible, activePlan }) => {
             })}
           </div>
         ) : (
-          <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+          <div className="premium-empty p-8 text-center">
             <div className="inline-flex p-3 rounded-full bg-gray-100 mb-4">
               <Calendar className="w-6 h-6 text-gray-400" />
             </div>

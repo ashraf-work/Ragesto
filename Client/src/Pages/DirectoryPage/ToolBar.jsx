@@ -36,7 +36,7 @@ const ToolBar = ({
     setShowSortDropdown(false);
   };
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 mb-2">
+    <div className="premium-card p-4 sm:p-6 mb-2">
       <div className="flex flex-col space-y-4 lg:space-y-0 lg:flex-row lg:items-center lg:justify-between">
         {/* Left side - Search and Controls */}
         <div className="flex flex-col sm:flex-row gap-3 sm:items-center flex-1 lg:flex-none">
@@ -48,7 +48,7 @@ const ToolBar = ({
               placeholder="Search files and folders..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full min-[1024px]:w-80  pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg transition-colors text-sm placeholder-gray-500 focus:outline-none focus:ring-0 focus:border-gray-300"
+              className="premium-input w-full min-[1024px]:w-80 pl-10 pr-4 py-2.5 rounded-xl transition-colors text-sm placeholder-gray-500 focus:outline-none"
             />
 
             {searchTerm && (
@@ -65,13 +65,13 @@ const ToolBar = ({
         {/* Right side - View Controls */}
         <div className="flex items-center justify-end gap-3">
           {/* View Mode Toggle */}
-          <div className="flex bg-gray-100 rounded-lg p-1">
+          <div className="flex bg-[var(--surface-soft)] rounded-full p-1 border border-[var(--border)]">
             <button
               onClick={() => setViewMode("grid")}
               className={`flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                 viewMode === "grid"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  ? "bg-[var(--surface)] text-gray-900 shadow-sm"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-[var(--surface-blue)]"
               }`}
               title="Grid view"
             >
@@ -81,8 +81,8 @@ const ToolBar = ({
               onClick={() => setViewMode("list")}
               className={`flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                 viewMode === "list"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  ? "bg-[var(--surface)] text-gray-900 shadow-sm"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-[var(--surface-blue)]"
               }`}
               title="List view"
             >
@@ -94,7 +94,7 @@ const ToolBar = ({
           <div className="relative">
             <button
               onClick={() => setShowSortDropdown(!showSortDropdown)}
-              className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 text-sm font-medium bg-white"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl premium-button-secondary text-sm font-medium"
             >
               <ArrowUpDown className="w-4 h-4 text-gray-500" />
               <span className="hidden sm:inline">Sort by</span>
@@ -112,7 +112,7 @@ const ToolBar = ({
                   className="fixed inset-0 z-10"
                   onClick={() => setShowSortDropdown(false)}
                 />
-                <div className="absolute right-0 top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-20 min-w-[180px] animate-in fade-in-0 zoom-in-95 duration-100">
+                <div className="absolute right-0 top-full mt-2 premium-panel py-1 z-20 min-w-[180px] animate-in fade-in-0 zoom-in-95 duration-100 overflow-hidden">
                   <div className="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide border-b border-gray-100">
                     Sort by
                   </div>
@@ -126,7 +126,7 @@ const ToolBar = ({
                       <button
                         key={option.key}
                         onClick={() => handleSort(option.key)}
-                        className="w-full px-3 py-2.5 text-left text-sm hover:bg-gray-50 flex items-center justify-between group transition-colors"
+                        className="w-full px-3 py-2.5 text-left text-sm hover:bg-[var(--surface-blue)] flex items-center justify-between group transition-colors"
                       >
                         <div className="flex items-center gap-2">
                           <IconComponent className="w-4 h-4 text-gray-400 group-hover:text-gray-600" />

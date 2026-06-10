@@ -12,11 +12,11 @@ const Stats = ({stats}) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
       {/* Shared With Me Card */}
-      <div className="group relative overflow-hidden bg-white rounded-2xl border border-gray-200">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      <div className="group relative overflow-hidden premium-card">
+        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-400"></div>
         <div className="relative p-6">
           <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-blue-100 rounded-xl group-hover:bg-blue-200 transition-colors duration-300">
+            <div className="p-3 bg-[var(--primary-soft)] rounded-xl group-hover:bg-blue-100 transition-colors duration-300">
               <Share2 size={20} className="text-blue-600" />
             </div>
             <div className="text-right">
@@ -33,7 +33,7 @@ const Stats = ({stats}) => {
           </div>
           <button
             onClick={() => navigate("/share/shared-with-me")}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all duration-200 group/btn"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-medium rounded-xl premium-button-secondary group/btn"
           >
             View All Files
             <ArrowRight
@@ -45,11 +45,11 @@ const Stats = ({stats}) => {
       </div>
 
       {/* Shared By Me Card */}
-      <div className="group relative overflow-hidden bg-white rounded-2xl border border-gray-200">
-        <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      <div className="group relative overflow-hidden premium-card">
+        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-teal-500 to-emerald-400"></div>
         <div className="relative p-6">
           <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-green-100 rounded-xl group-hover:bg-green-200 transition-colors duration-300">
+            <div className="p-3 bg-[var(--secondary-soft)] rounded-xl group-hover:bg-teal-100 transition-colors duration-300">
               <Users size={20} className="text-green-600" />
             </div>
             <div className="text-right">
@@ -66,7 +66,7 @@ const Stats = ({stats}) => {
           </div>
           <button
             onClick={() => navigate("/share/shared-by-me")}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-medium text-green-600 hover:text-green-700 bg-green-50 hover:bg-green-100 rounded-xl transition-all duration-200 group/btn"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-medium rounded-xl premium-button-secondary group/btn"
           >
             Manage Files
             <Settings2
@@ -78,12 +78,12 @@ const Stats = ({stats}) => {
       </div>
 
       {/* Collaborators Card */}
-      <div className="group relative overflow-hidden bg-white rounded-2xl border border-gray-200 ">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      <div className="group relative overflow-hidden premium-card">
+        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-slate-500 to-indigo-400"></div>
         <div className="relative p-6">
           <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-purple-100 rounded-xl group-hover:bg-purple-200 transition-colors duration-300">
-              <UserCheck size={20} className="text-purple-600" />
+            <div className="p-3 bg-slate-100 rounded-xl group-hover:bg-indigo-100 transition-colors duration-300">
+              <UserCheck size={20} className="text-indigo-600" />
             </div>
             <div className="text-right">
               <p className="text-xl sm:text-2xl font-bold text-gray-900">

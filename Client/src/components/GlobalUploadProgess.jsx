@@ -4,7 +4,7 @@ import { useGlobalProgress } from "../Contexts/ProgressContext"
 import { useModal } from "../Contexts/ModalContext"
 
 export function GlobalUploadProgress() {
-  const { active, total, completed, percent } = useGlobalProgress()
+  const { active, total, completed, percent, currentFileName, message } = useGlobalProgress()
   const { showModal } = useModal()
 
   const isFinished = useMemo(() => {
@@ -44,6 +44,9 @@ export function GlobalUploadProgress() {
   const ariaLabel = isFinished ? "Upload completed successfully" : "File upload in progress"
   const percentSafe = Number.isFinite(percent) ? Math.max(0, Math.min(100, percent)) : 0
   const countText = total > 0 ? `${Math.min(completed, total)} of ${total} files` : "Preparing upload..."
+  const detailText = isFinished
+    ? "All files uploaded successfully"
+    : message || (currentFileName ? `Importing ${currentFileName}` : "Please don't close this window")
 
   return (
     <div
@@ -73,7 +76,7 @@ export function GlobalUploadProgress() {
                 {isFinished ? "Upload Complete" : "Uploading Files"}
               </h3>
               <p className="text-xs text-gray-500 mt-0.5">
-                {isFinished ? "All files uploaded successfully" : "Please don't close this window"}
+                {detailText}
               </p>
             </div>
             
@@ -122,8 +125,8 @@ export function GlobalUploadProgress() {
             }`} />
             <span className="text-xs text-gray-500">
               {isFinished 
-                ? "Files are now available in your drive" 
-                : "Upload in progress, please wait..."
+                ? "Files are now available in your drive"
+                : currentFileName || "Upload in progress, please wait..."
               }
             </span>
           </div>

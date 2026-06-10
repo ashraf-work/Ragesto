@@ -70,8 +70,8 @@ const DirectoryView = ({
   };
 
   return (
-    <div className="min-h-full bg-gray-50 max-[800px]:pb-20">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-full max-[800px]:pb-20">
+      <div className="max-w-7xl mx-auto space-y-4">
         {/* ToolBar -> Searching/Sorting/viewing */}
         <ToolBar
           searchTerm={searchTerm}
@@ -91,8 +91,9 @@ const DirectoryView = ({
         {/* Content */}
         {/* Items Grid/List */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+          <div className="premium-empty flex flex-col items-center justify-center py-20">
+            <div className="h-12 w-12 rounded-full premium-skeleton mb-4"></div>
+            <div className="h-3 w-40 rounded-full premium-skeleton"></div>
           </div>
         ) : filteredAndSortedItems.length > 0 ? (
           <div
@@ -117,8 +118,10 @@ const DirectoryView = ({
             ))}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <Folder className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <div className="premium-empty text-center py-14 px-6">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--surface-blue)]">
+              <Folder className="w-8 h-8 text-[var(--primary)]" />
+            </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
               {searchTerm ? "No results found" : "No files or folders"}
             </h3>

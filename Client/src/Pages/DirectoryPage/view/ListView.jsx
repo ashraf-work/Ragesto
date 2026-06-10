@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { Download, Info, MoreVertical } from "lucide-react";
 import {
   formatDate,
@@ -13,6 +14,8 @@ const ListView = ({
   setActiveDropdown,
   activeDropdown,
 }) => {
+  const menuButtonRef = useRef(null);
+
   return (
     <div className="group bg-white border border-gray-200 rounded-lg hover:shadow-md hover:border-gray-300 transition-all duration-200">
       <div className="flex items-center justify-between p-3 sm:p-4">
@@ -70,6 +73,7 @@ const ListView = ({
 
           <div className="relative">
             <button
+              ref={menuButtonRef}
               onClick={(e) => {
                 e.stopPropagation();
                 setActiveDropdown(
@@ -83,6 +87,7 @@ const ListView = ({
             {activeDropdown === item._id && (
               <DropdownMenu
                 item={item}
+                anchorRef={menuButtonRef}
                 setActiveDropdown={setActiveDropdown}
                 handleAction={handleAction}
               />

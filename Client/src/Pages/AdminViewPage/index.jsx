@@ -49,7 +49,7 @@ const AdminView = () => {
   }
 
   return (
-    <div className="bg-gray-50  py-5">
+    <div className="py-5">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <Header currentUser={currentUser} goTo={"/"} backTo={"Home"}/>

@@ -1,19 +1,69 @@
+import { useLayoutEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Download, Edit2, Info, Share2, Trash2 } from "lucide-react";
 
-export const DropdownMenu = ({ item, setActiveDropdown, handleAction, }) => {
-  return (
+const MENU_WIDTH = 190;
+const MENU_GAP = 8;
+const VIEWPORT_GAP = 12;
+
+export const DropdownMenu = ({
+  item,
+  anchorRef,
+  setActiveDropdown,
+  handleAction,
+}) => {
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+
+  useLayoutEffect(() => {
+    function updatePosition() {
+      const anchor = anchorRef?.current;
+      if (!anchor) return;
+
+      const rect = anchor.getBoundingClientRect();
+      const menuWidth = Math.min(MENU_WIDTH, window.innerWidth - VIEWPORT_GAP * 2);
+      const estimatedHeight = item.type === "file" ? 220 : 140;
+      const hasSpaceBelow =
+        window.innerHeight - rect.bottom > estimatedHeight + MENU_GAP;
+      const top = hasSpaceBelow
+        ? rect.bottom + MENU_GAP
+        : Math.max(VIEWPORT_GAP, rect.top - estimatedHeight - MENU_GAP);
+      const left = Math.min(
+        Math.max(VIEWPORT_GAP, rect.right - menuWidth),
+        window.innerWidth - menuWidth - VIEWPORT_GAP
+      );
+
+      setPosition({ top, left });
+    }
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [anchorRef, item.type]);
+
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <>
       <div
-        className="fixed inset-0 z-40"
+        className="fixed inset-0 z-[9000]"
         onClick={(e) => {
           e.stopPropagation();
           setActiveDropdown(null);
         }}
       />
-      <div className="absolute right-0 bottom-8 bg-white border border-gray-200 rounded-xl shadow-lg py-2 z-50 min-w-[180px]">
+      <div
+        className="fixed z-[9010] w-[min(190px,calc(100vw-24px))] rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-1.5 shadow-[0_18px_48px_rgba(15,23,42,0.18)]"
+        style={{ top: position.top, left: position.left }}
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           onClick={(e) => handleAction(e, "details")}
-          className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+          className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-blue)]"
         >
           <Info className="w-4 h-4" />
           <span>Details</span>
@@ -22,14 +72,14 @@ export const DropdownMenu = ({ item, setActiveDropdown, handleAction, }) => {
           <>
             <button
               onClick={(e) => handleAction(e, "download")}
-              className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+              className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-blue)]"
             >
               <Download className="w-4 h-4" />
               <span>Download</span>
             </button>
             <button
               onClick={(e) => handleAction(e, "share")}
-              className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+              className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-blue)]"
             >
               <Share2 className="w-4 h-4" />
               <span>Share</span>
@@ -38,21 +88,20 @@ export const DropdownMenu = ({ item, setActiveDropdown, handleAction, }) => {
         )}
         <button
           onClick={(e) => handleAction(e, "rename")}
-          className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+          className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-blue)]"
         >
           <Edit2 className="w-4 h-4" />
           <span>Rename</span>
         </button>
         <button
           onClick={(e) => handleAction(e, "delete")}
-          className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2"
+          className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-[var(--danger)] transition-colors hover:bg-red-50"
         >
           <Trash2 className="w-4 h-4" />
           <span>Delete</span>
         </button>
-
-        <div className="absolute -bottom-1 right-4 w-2 h-2 bg-white border-r border-b border-gray-200 transform rotate-45"></div>
       </div>
-    </>
+    </>,
+    document.body
   );
 };

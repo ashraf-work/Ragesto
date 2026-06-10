@@ -26,7 +26,7 @@ const Breadcrumb = ({ breadCrumb }) => {
   };
 
   return (
-    <nav className="flex items-center text-sm text-gray-600 mb-4 sm:mb-6 p-3 sm:p-4 bg-white rounded-lg border border-gray-200">
+    <nav className="premium-card flex items-center text-sm text-gray-600 mb-4 sm:mb-6 p-3 sm:p-4">
       {/* Mobile Layout - Current location with back button */}
       <div className="flex items-center justify-between w-full sm:hidden">
         <div className="flex items-center min-w-0 flex-1">
@@ -34,7 +34,7 @@ const Breadcrumb = ({ breadCrumb }) => {
           {!isAtRoot && (
             <button
               onClick={handleBack}
-              className="flex items-center p-2 rounded hover:bg-gray-100 transition-colors mr-2 flex-shrink-0"
+              className="flex items-center p-2 rounded-lg hover:bg-[var(--surface-blue)] transition-colors mr-2 flex-shrink-0"
               title="Go back"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -63,7 +63,7 @@ const Breadcrumb = ({ breadCrumb }) => {
           <div className="relative ml-2">
             <button
               onClick={() => setShowDropdown(!showDropdown)}
-              className="flex items-center p-2 rounded hover:bg-gray-100 transition-colors"
+              className="flex items-center p-2 rounded-lg hover:bg-[var(--surface-blue)] transition-colors"
               title="Show full path"
             >
               <ChevronDown className="w-4 h-4" />
@@ -75,7 +75,7 @@ const Breadcrumb = ({ breadCrumb }) => {
                   className="fixed inset-0 z-10"
                   onClick={() => setShowDropdown(false)}
                 />
-                <div className="absolute right-0 top-12 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-20 min-w-[200px] max-w-[280px]">
+                <div className="absolute right-0 top-12 premium-panel py-2 z-20 min-w-[200px] max-w-[280px] overflow-hidden">
                   <div className="px-3 py-2 text-xs font-medium text-gray-500 border-b border-gray-100">
                     Full Path
                   </div>
@@ -91,9 +91,9 @@ const Breadcrumb = ({ breadCrumb }) => {
                         setShowDropdown(false);
                       }}
                       disabled={dirId === item._id}
-                      className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center ${
+                      className={`w-full px-3 py-2 text-left text-sm hover:bg-[var(--surface-blue)] flex items-center ${
                         dirId === item._id
-                          ? "text-gray-900 font-medium bg-gray-50"
+                          ? "text-gray-900 font-medium bg-[var(--surface-blue)]"
                           : "text-gray-600"
                       }`}
                     >
@@ -113,10 +113,10 @@ const Breadcrumb = ({ breadCrumb }) => {
         <button
           onClick={() => navigate(`/`)}
           disabled={!dirId}
-          className={`flex items-center p-1.5 rounded transition-colors flex-shrink-0 ${
+          className={`flex items-center p-1.5 rounded-lg transition-colors flex-shrink-0 ${
             !dirId
               ? "text-gray-400 cursor-default"
-              : "hover:text-blue-600 hover:bg-blue-50"
+              : "hover:text-blue-600 hover:bg-[var(--surface-blue)]"
           }`}
         >
           <Home className="w-4 h-4" />
