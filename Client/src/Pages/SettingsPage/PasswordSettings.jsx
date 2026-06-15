@@ -1,4 +1,4 @@
-import { Eye, EyeOff, Lock } from "lucide-react";
+import { CheckCircle2, Eye, EyeOff, KeyRound, Lock } from "lucide-react";
 import { useState } from "react";
 import { setPassword, updatePassword } from "../../Apis/authApi";
 import { useModal } from "../../Contexts/ModalContext";
@@ -9,39 +9,34 @@ const PasswordSettings = ({
   hasManualPassword,
   setHasManualPassword,
 }) => {
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const { showModal } = useModal();
 
   const handlePasswordAction = async () => {
     const { current, new: newPass, confirm } = passwordData;
 
-
     if (newPass !== confirm) {
       showModal("Mismatch", "New passwords do not match!", "error");
       return;
     }
-
     if (newPass.length <= 3) {
-      showModal(
-        "Invalid",
-        "Password must be longer than 3 characters!",
-        "error"
-      );
+      showModal("Invalid", "Password must be longer than 3 characters!", "error");
       return;
     }
-
     if (hasManualPassword && current === confirm) {
       showModal("Invalid", "Old and New password cannot be same!", "error");
       return;
     }
 
-
+    setSubmitting(true);
     const res = hasManualPassword
       ? await updatePassword(current, confirm)
       : await setPassword(confirm);
+    setSubmitting(false);
 
     if (res.success) {
       showModal(
@@ -58,111 +53,99 @@ const PasswordSettings = ({
     }
   };
 
-  return (
-    <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-      <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6 flex items-center">
-        <Lock className="mr-2" size={20} />
-        {hasManualPassword
-          ? "Change Password"
-          : "Set Password for Manual Login"}
-      </h2>
+  const PasswordField = ({ label, value, onChange, show, setShow, testId }) => (
+    <div>
+      <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-2">
+        {label}
+      </label>
+      <div className="relative">
+        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-subtle)]" />
+        <input
+          type={show ? "text" : "password"}
+          value={value}
+          onChange={onChange}
+          data-testid={testId}
+          className="premium-input w-full pl-10 pr-11 py-2.5 rounded-xl text-sm font-medium"
+        />
+        <button
+          type="button"
+          onClick={() => setShow(!show)}
+          tabIndex={-1}
+          className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-[var(--text-subtle)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-3)] transition"
+        >
+          {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+        </button>
+      </div>
+    </div>
+  );
 
-      <div className="mb-4">
-        <p className="text-gray-600 text-sm sm:text-base">
-          {hasManualPassword
-            ? "Update your password for manual login access."
-            : "Set a password to enable manual login in addition to your social login."}
-        </p>
+  return (
+    <div className="premium-card p-5 sm:p-6" data-testid="password-settings-card">
+      <div className="flex items-start gap-3 mb-5">
+        <div className="w-9 h-9 rounded-xl bg-[var(--primary-soft)] flex items-center justify-center flex-shrink-0">
+          <KeyRound className="w-4.5 h-4.5 text-[var(--primary)]" />
+        </div>
+        <div>
+          <h2 className="text-lg font-bold text-[var(--text-primary)]">
+            {hasManualPassword ? "Change password" : "Set up password"}
+          </h2>
+          <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-0.5">
+            {hasManualPassword
+              ? "Use a strong password that you don't use anywhere else."
+              : "Set a password to enable manual login in addition to social login."}
+          </p>
+        </div>
       </div>
 
       <div className="space-y-4">
         {hasManualPassword && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Current Password
-            </label>
-            <div className="relative">
-              <input
-                tabIndex={1}
-                type={showCurrentPassword ? "text" : "password"}
-                value={passwordData.current}
-                onChange={(e) =>
-                  setPasswordData({
-                    ...passwordData,
-                    current: e.target.value,
-                  })
-                }
-                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <button
-                type="button"
-                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-              >
-                {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-          </div>
+          <PasswordField
+            label="Current password"
+            value={passwordData.current}
+            onChange={(e) =>
+              setPasswordData({ ...passwordData, current: e.target.value })
+            }
+            show={showCurrent}
+            setShow={setShowCurrent}
+            testId="password-current"
+          />
         )}
+        <PasswordField
+          label={hasManualPassword ? "New password" : "Password"}
+          value={passwordData.new}
+          onChange={(e) =>
+            setPasswordData({ ...passwordData, new: e.target.value })
+          }
+          show={showNew}
+          setShow={setShowNew}
+          testId="password-new"
+        />
+        <PasswordField
+          label={hasManualPassword ? "Confirm new password" : "Confirm password"}
+          value={passwordData.confirm}
+          onChange={(e) =>
+            setPasswordData({ ...passwordData, confirm: e.target.value })
+          }
+          show={showConfirm}
+          setShow={setShowConfirm}
+          testId="password-confirm"
+        />
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {hasManualPassword ? "New Password" : "Password"}
-          </label>
-          <div className="relative">
-            <input
-              tabIndex={2}
-              type={showNewPassword ? "text" : "password"}
-              value={passwordData.new}
-              onChange={(e) =>
-                setPasswordData({ ...passwordData, new: e.target.value })
-              }
-              className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              type="button"
-              onClick={() => setShowNewPassword(!showNewPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-            >
-              {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-            </button>
-          </div>
+        <div className="pt-2 flex justify-end">
+          <button
+            onClick={handlePasswordAction}
+            disabled={submitting}
+            data-testid="password-submit-btn"
+            className="inline-flex items-center px-4 py-2.5 rounded-xl premium-button-primary text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <CheckCircle2 className="w-4 h-4 mr-1.5" />
+            {submitting
+              ? "Saving..."
+              : hasManualPassword
+              ? "Update password"
+              : "Set password"}
+          </button>
         </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {hasManualPassword ? "Confirm New Password" : "Confirm Password"}
-          </label>
-          <div className="relative">
-            <input
-              tabIndex={3}
-              type={showConfirmPassword ? "text" : "password"}
-              value={passwordData.confirm}
-              onChange={(e) =>
-                setPasswordData({
-                  ...passwordData,
-                  confirm: e.target.value,
-                })
-              }
-              className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              type="button"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-            >
-              {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-            </button>
-          </div>
-        </div>
-
-        <button
-          tabIndex={4}
-          onClick={handlePasswordAction}
-          className="w-full sm:w-auto bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
-        >
-          {hasManualPassword ? "Change Password" : "Set Password"}
-        </button>
       </div>
     </div>
   );

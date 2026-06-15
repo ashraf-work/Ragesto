@@ -1,58 +1,34 @@
+import { AlertOctagon, PauseCircle, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { deleteAccount, disableAccount } from "../../Apis/userApi";
-import { Trash2 } from "lucide-react";
 import { useModal } from "../../Contexts/ModalContext";
 import { useAuth } from "../../Contexts/AuthContext";
 
-const AccountOptions = ({
-  option,
-}) => {
+const AccountOptions = ({ option }) => {
   const navigate = useNavigate();
   const { setIsAuth } = useAuth();
   const { showModal, showConfirmModal, closeConfirmModal } = useModal();
 
-  const styles = {
+  const config = {
     delete: {
-      color: "red",
-      iconColor: "text-red-900",
-      bgColor: "bg-red-50",
-      borderColor: "border-red-200",
-      textColor: "text-red-700",
-      buttonColor: "bg-red-600 hover:bg-red-700",
-    },
-    disable: {
-      color: "yellow",
-      iconColor: "text-yellow-900",
-      bgColor: "bg-yellow-50",
-      borderColor: "border-yellow-200",
-      textColor: "text-yellow-700",
-      buttonColor: "bg-yellow-500 hover:bg-yellow-600 text-black",
-    },
-  };
-
-  const handlers = {
-    delete: {
-      buttonTag: "Delete Account Permanently",
-      headerTag: "Delete My Account",
-      subject: "⚠️ This action cannot be undone",
-      Info: "Deleting your account will permanently remove all your data, files, and settings. You will lose access to all connected services and this action cannot be reversed.",
+      title: "Delete account",
+      icon: Trash2,
+      tone: "danger",
+      subject: "This action is permanent.",
+      info: "Deleting your account will permanently remove all your data, files, and settings. You will lose access to all connected services and this cannot be reversed.",
+      cta: "Delete account permanently",
       handler: () => {
         showConfirmModal(
-          "Delete Account",
+          "Delete account",
           "Are you sure you want to delete your account? This action cannot be undone and will permanently remove all your data.",
           async () => {
             const res = await deleteAccount();
-
             if (res.success) {
               showModal("Account Deleted", "Your account has been deleted.");
               setIsAuth(false);
               setTimeout(() => navigate("/login"), 1000);
             } else {
-              showModal(
-                "Error",
-                res.message || "Something went wrong.",
-                "error"
-              );
+              showModal("Error", res.message || "Something went wrong.", "error");
             }
             closeConfirmModal();
           },
@@ -61,14 +37,16 @@ const AccountOptions = ({
       },
     },
     disable: {
-      buttonTag: "Disable Account",
-      headerTag: "Disable My Account",
-      subject: "⚠️ This action is temporary and can be reversed.",
-      Info: "Disabling your account will hide your profile and stop all email or app notifications. Your data will be retained securely and can be restored anytime by contacting our support team.",
+      title: "Disable account",
+      icon: PauseCircle,
+      tone: "warning",
+      subject: "Temporary and reversible.",
+      info: "Disabling your account will hide your profile and stop all notifications. Your data will be retained securely and can be restored anytime by contacting our support team.",
+      cta: "Disable my account",
       handler: () => {
         showConfirmModal(
-          "Disable Account",
-          "Are you sure you want to disable your account? This will hide your profile and stop notifications. You can reactivate it later by contacting our support team.",
+          "Disable account",
+          "Are you sure you want to disable your account? You can reactivate it later by contacting support.",
           async () => {
             const res = await disableAccount();
             if (res.success) {
@@ -77,14 +55,10 @@ const AccountOptions = ({
                 "Your account has been disabled. Contact support@ragesto.cloud to reactivate.",
                 "success"
               );
-              setIsAuth(false)
+              setIsAuth(false);
               setTimeout(() => navigate("/login"), 1000);
             } else {
-              showModal(
-                "Error",
-                res.message || "Something went wrong.",
-                "error"
-              );
+              showModal("Error", res.message || "Something went wrong.", "error");
             }
             closeConfirmModal();
           },
@@ -94,30 +68,55 @@ const AccountOptions = ({
     },
   };
 
-  const { buttonTag, headerTag, subject, Info, handler } = handlers[option];
+  const { title, icon: Icon, tone, subject, info, cta, handler } = config[option];
 
-  const { iconColor, bgColor, borderColor, textColor, buttonColor } =
-    styles[option];
+  const toneClasses = {
+    danger: {
+      iconBg: "bg-[var(--danger-soft)]",
+      iconColor: "text-[var(--danger)]",
+      cardBorder: "border-[rgba(239,68,68,0.18)]",
+      banner: "bg-[var(--danger-soft)] text-[var(--danger-strong)] border-[rgba(239,68,68,0.18)]",
+      btn: "bg-[var(--danger)] hover:bg-[var(--danger-strong)] text-white",
+    },
+    warning: {
+      iconBg: "bg-[var(--warning-soft)]",
+      iconColor: "text-[var(--warning-strong)]",
+      cardBorder: "border-[rgba(245,158,11,0.22)]",
+      banner: "bg-[var(--warning-soft)] text-[var(--warning-strong)] border-[rgba(245,158,11,0.22)]",
+      btn: "bg-[var(--warning)] hover:brightness-95 text-white",
+    },
+  };
+  const t = toneClasses[tone];
 
   return (
     <div
-      className={`bg-white rounded-lg shadow-sm border ${borderColor} p-4 sm:p-6`}
+      className={`premium-card p-5 sm:p-6 border ${t.cardBorder}`}
+      data-testid={`account-option-${option}`}
     >
-      <h2
-        className={`text-lg sm:text-xl font-semibold ${iconColor} mb-4 flex items-center`}
-      >
-        <Trash2 className="mr-2" size={20} />
-        {headerTag}
-      </h2>
-      <div className={`${bgColor} border ${borderColor} rounded-md p-4 mb-4`}>
-        <p className={`font-medium mb-2 ${textColor}`}>{subject}</p>
-        <p className={`text-sm ${textColor}`}>{Info}</p>
+      <div className="flex items-start gap-3 mb-4">
+        <div className={`w-9 h-9 rounded-xl ${t.iconBg} flex items-center justify-center flex-shrink-0`}>
+          <Icon className={`w-4.5 h-4.5 ${t.iconColor}`} />
+        </div>
+        <div>
+          <h2 className="text-lg font-bold text-[var(--text-primary)]">{title}</h2>
+          <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-0.5">
+            {subject}
+          </p>
+        </div>
       </div>
+
+      <div className={`flex items-start gap-2.5 p-4 rounded-xl border ${t.banner} mb-5`}>
+        <AlertOctagon className="w-4 h-4 flex-shrink-0 mt-0.5" />
+        <p className="text-sm">{info}</p>
+      </div>
+
       <button
         onClick={handler}
-        className={`w-full sm:w-auto ${buttonColor} px-6 py-2 rounded-md transition-colors font-medium text-white`}
+        data-testid={`account-${option}-btn`}
+        className={`w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${t.btn}`}
       >
-        {buttonTag}
+        <Icon className="w-4 h-4 mr-1.5" />
+        {cta}
       </button>
     </div>
   );

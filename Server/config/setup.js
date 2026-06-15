@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import mongoose from "mongoose";
 import { connectDB } from "./db.js";
+import { ensureSubscriptionIndexes } from "./subscriptionIndexes.js";
 
 const rootPath = import.meta.dirname;
 
@@ -16,6 +17,7 @@ function ensureProfilePicturesFolder() {
 }
 
 await connectDB();
+await ensureSubscriptionIndexes();
 
 ensureProfilePicturesFolder();
 const db = mongoose.connection.db;

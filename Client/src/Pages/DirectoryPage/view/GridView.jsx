@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Download, Info, MoreVertical } from "lucide-react";
+import { MoreVertical } from "lucide-react";
 import { formatDate, formatFileSize, getFileIcon } from "../../../Utils/helpers";
 import { DropdownMenu } from "../Dropdown";
 
@@ -11,87 +11,83 @@ const GridView = ({
   activeDropdown,
 }) => {
   const menuButtonRef = useRef(null);
+  const isFolder = item.type === "directory";
 
   return (
-    <div className="group premium-card overflow-hidden">
-      <div className="p-3 sm:p-4 cursor-pointer" onClick={handleOpen}>
-        <div className="flex items-start justify-between mb-3">
-          <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-50 to-slate-100 rounded-lg sm:rounded-xl group-hover:from-blue-100 group-hover:to-teal-50 transition-all duration-200">
-            {getFileIcon(item)}
-          </div>
-          <div className="relative">
-            <button
-              ref={menuButtonRef}
-              onClick={(e) => {
-                e.stopPropagation();
-                setActiveDropdown(
-                  activeDropdown === item._id ? null : item._id
-                );
+    <div
+      className="group premium-card overflow-hidden relative"
+      data-testid={`grid-item-${item.name}`}
+    >
+      {/* More button overlay */}
+      <div className="absolute top-2.5 right-2.5 z-10">
+        <button
+          ref={menuButtonRef}
+          onClick={(e) => {
+            e.stopPropagation();
+            setActiveDropdown(activeDropdown === item._id ? null : item._id);
+          }}
+          data-testid={`grid-item-menu-${item.name}`}
+          className="p-1.5 rounded-lg bg-[var(--surface)]/80 backdrop-blur-sm border border-[var(--border)] hover:bg-[var(--surface)] hover:border-[var(--border-strong)] transition opacity-100 md:opacity-0 md:group-hover:opacity-100"
+        >
+          <MoreVertical className="w-4 h-4 text-[var(--text-secondary)]" />
+        </button>
+        {activeDropdown === item._id && (
+          <DropdownMenu
+            item={item}
+            anchorRef={menuButtonRef}
+            setActiveDropdown={setActiveDropdown}
+            handleAction={handleAction}
+          />
+        )}
+      </div>
+
+      <button
+        type="button"
+        onClick={handleOpen}
+        className="block w-full text-left p-4 cursor-pointer"
+      >
+        {/* Thumbnail / icon */}
+        <div
+          className={`relative aspect-[16/10] mb-3 rounded-xl flex items-center justify-center overflow-hidden transition-all duration-300 ${
+            isFolder
+              ? "bg-gradient-to-br from-[#eef2ff] via-[#f5f3ff] to-[#ecfeff]"
+              : "bg-[var(--surface-3)]"
+          }`}
+          style={{ border: "1px solid var(--border-subtle)" }}
+        >
+          {/* Decorative pattern for folders */}
+          {isFolder && (
+            <div
+              className="absolute inset-0 opacity-30 pointer-events-none"
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle at 1px 1px, rgba(79,70,229,0.4) 1px, transparent 0)",
+                backgroundSize: "16px 16px",
               }}
-              className="p-1.5 sm:p-2 rounded-lg hover:bg-[var(--surface-blue)] transition-colors sm:opacity-0 sm:group-hover:opacity-100"
-            >
-              <MoreVertical className="w-4 h-4 text-gray-500" />
-            </button>
-            {activeDropdown === item._id && (
-              <DropdownMenu
-                item={item}
-                anchorRef={menuButtonRef}
-                setActiveDropdown={setActiveDropdown}
-                handleAction={handleAction}
-              />
-            )}
+            />
+          )}
+          <div className="relative scale-[1.7] transition-transform duration-300 group-hover:scale-[1.85]">
+            {getFileIcon(item, "grid")}
           </div>
         </div>
 
-        <div className="space-y-2 sm:space-y-3">
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900 truncate mb-1">
-              {item.name}
-            </h3>
-            <span className="inline-flex items-center px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium bg-[var(--surface-blue)] text-[var(--primary)]">
-              {item.type === "directory"
+        {/* File info */}
+        <div>
+          <h3 className="text-sm font-semibold text-[var(--text-primary)] truncate leading-tight">
+            {item.name}
+          </h3>
+          <div className="mt-1.5 flex items-center justify-between gap-2">
+            <span className="chip !py-0.5 !px-2 text-[10px]">
+              {isFolder
                 ? "Folder"
                 : item.name.split(".").pop()?.toUpperCase() || "File"}
             </span>
-          </div>
-
-          <div className="space-y-1 sm:space-y-2 text-xs text-gray-500">
-            <div className="flex items-center justify-between">
-              <span className="text-gray-400">Size</span>
-              <span className="font-medium text-gray-600">
-                {formatFileSize(item.size)}
-              </span>
-            </div>
-            <div className="hidden sm:flex items-center justify-between">
-              <span className="text-gray-400">Modified</span>
-              <span className="font-medium text-gray-600">
-                {formatDate(item.updatedAt)}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between pt-2 border-t border-[var(--border)]">
-            <button
-              onClick={(e) => handleAction(e, "details")}
-              className="flex items-center space-x-1 px-2 py-1 rounded-md hover:bg-[var(--surface-blue)] transition-colors"
-              title="View details"
-            >
-              <Info className="w-3 h-3" />
-              <span className="text-xs">Details</span>
-            </button>
-            {item.type === "file" && (
-              <button
-                onClick={(e) => handleAction(e, "download")}
-                className="flex items-center space-x-1 px-2 py-1 rounded-md hover:bg-[var(--surface-blue)] transition-colors"
-                title="Download file"
-              >
-                <Download className="w-3 h-3" />
-                <span className="text-xs">Download</span>
-              </button>
-            )}
+            <span className="text-[11px] text-[var(--text-subtle)] font-medium truncate">
+              {isFolder ? formatDate(item.updatedAt) : formatFileSize(item.size)}
+            </span>
           </div>
         </div>
-      </div>
+      </button>
     </div>
   );
 };

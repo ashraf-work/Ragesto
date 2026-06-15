@@ -1,9 +1,11 @@
+import { AlertCircle, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import StepProgress from "../../components/StepProgress";
-import CredentialsForm from "../../components/Forms/CredentialsForm";
-import OTPForm from "../../components/Forms/OTPForm";
-import SocialAuthButtons from "../../components/SocialAuthButtons";
+import StepProgress from "../StepProgress";
+import CredentialsForm from "./CredentialsForm";
+import OTPForm from "./OTPForm";
+import SocialAuthButtons from "../SocialAuthButtons";
+import AuthLayout from "../AuthLayout";
 import { register, sendOTP } from "../../Apis/authApi";
 import { API_BASE_URL } from "../../Utils/apiBaseUrl";
 
@@ -34,21 +36,15 @@ export default function RegistrationForm() {
       setError("Please fill in all fields.");
       return;
     }
-
-    // Check name length
     if (name.length <= 3) {
       setError("Name must be more than 3 characters.");
       return;
     }
-
-    // Validate email format using regex
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setError("Please enter a valid email address.");
       return;
     }
-
-    // Check password length
     if (password.length <= 3) {
       setError("Password is too short. Please create a longer password.");
       return;
@@ -97,87 +93,100 @@ export default function RegistrationForm() {
     setSuccess("");
   };
 
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-blue-50 py-12 px-4">
-      <div className="max-w-lg w-full space-y-8 bg-white rounded-xl shadow-lg p-8">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Create Account</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            {currentStep === "credentials"
-              ? "Enter your details to get started"
-              : "Verify your email to complete registration"}
-          </p>
-        </div>
+    <AuthLayout
+      title={currentStep === "credentials" ? "Create your account" : "Almost there"}
+      subtitle={
+        currentStep === "credentials"
+          ? "Start with 500MB free storage — no credit card required."
+          : "Confirm your email to finish creating your account."
+      }
+    >
+      <StepProgress currentStep={currentStep} />
 
-        <StepProgress currentStep={currentStep} />
-
-        <form
-          className="space-y-6"
-          onSubmit={
-            currentStep === "credentials" ? handleSendOTP : handleFinalSubmit
-          }
-        >
-          {currentStep === "credentials" ? (
-            <CredentialsForm formData={formData} handleChange={handleChange} />
-          ) : (
-            <OTPForm
-              formData={formData}
-              handleChange={handleChange}
-              handleBackToCredentials={handleBackToCredentials}
-              handleResendOTP={handleResendOTP}
-              loading={loading}
-            />
-          )}
-
-          {success && (
-            <div className="bg-green-100 text-green-700 px-4 py-3 rounded">
-              {success}
-            </div>
-          )}
-          {error && (
-            <div className="bg-red-100 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full py-3 rounded-lg text-white font-medium ${
-              loading ? "bg-gray-400" : "bg-indigo-600 hover:bg-indigo-700"
-            }`}
-          >
-            {loading
-              ? currentStep === "credentials"
-                ? "Sending..."
-                : "Creating Account..."
-              : currentStep === "credentials"
-              ? "Send Verification Code"
-              : "Create Account"}
-          </button>
-        </form>
-
-        {currentStep === "credentials" && (
-          <>
-            <SocialAuthButtons
-              setError={setError}
-              githubURL={`${URL}/auth/github`}
-            />
-          </>
+      <form
+        className="space-y-5"
+        onSubmit={
+          currentStep === "credentials" ? handleSendOTP : handleFinalSubmit
+        }
+        data-testid={
+          currentStep === "credentials" ? "register-form" : "register-otp-form"
+        }
+      >
+        {currentStep === "credentials" ? (
+          <CredentialsForm formData={formData} handleChange={handleChange} />
+        ) : (
+          <OTPForm
+            formData={formData}
+            handleChange={handleChange}
+            handleBackToCredentials={handleBackToCredentials}
+            handleResendOTP={handleResendOTP}
+            loading={loading}
+          />
         )}
 
-        <div className="-mt-3 text-center">
-          <p className="text-sm text-gray-600">
-            Already have an account?{" "}
-            <button
-              onClick={() => navigate("/login")}
-              className="text-blue-600 hover:underline font-medium"
-            >
-              Sign in here
-            </button>
-          </p>
-        </div>
-      </div>
-    </div>
+        {success && (
+          <div
+            className="flex items-start gap-2.5 px-4 py-3 rounded-xl border bg-[var(--success-soft)] border-[rgba(16,185,129,0.18)] text-[var(--success-strong)] text-sm font-medium"
+            data-testid="register-success"
+          >
+            <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            <span>{success}</span>
+          </div>
+        )}
+        {error && (
+          <div
+            className="flex items-start gap-2.5 px-4 py-3 rounded-xl border bg-[var(--danger-soft)] border-[rgba(239,68,68,0.18)] text-[var(--danger-strong)] text-sm font-medium"
+            data-testid="register-error"
+          >
+            <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          data-testid="register-submit-btn"
+          className={`w-full py-3 px-5 rounded-xl text-sm font-semibold transition-all duration-200 ${
+            loading
+              ? "bg-[var(--surface-3)] text-[var(--text-subtle)] cursor-not-allowed"
+              : "premium-button-primary"
+          }`}
+        >
+          {loading ? (
+            <span className="inline-flex items-center justify-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              {currentStep === "credentials" ? "Sending..." : "Creating..."}
+            </span>
+          ) : (
+            <span className="inline-flex items-center justify-center gap-2">
+              {currentStep === "credentials"
+                ? "Send verification code"
+                : "Create account"}
+              <ArrowRight className="w-4 h-4" />
+            </span>
+          )}
+        </button>
+
+        {currentStep === "credentials" && (
+          <SocialAuthButtons
+            setError={setError}
+            githubURL={`${URL}/auth/github`}
+          />
+        )}
+      </form>
+
+      <p className="mt-8 text-center text-sm text-[var(--text-muted)]">
+        Already have an account?{" "}
+        <button
+          onClick={() => navigate("/login")}
+          data-testid="link-to-login"
+          className="font-semibold text-[var(--primary)] hover:text-[var(--primary-hover)] transition-colors"
+        >
+          Sign in
+        </button>
+      </p>
+    </AuthLayout>
   );
 }

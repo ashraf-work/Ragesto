@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Download, Info, MoreVertical } from "lucide-react";
+import { MoreVertical } from "lucide-react";
 import {
   formatDate,
   formatFileSize,
@@ -15,84 +15,74 @@ const ListView = ({
   activeDropdown,
 }) => {
   const menuButtonRef = useRef(null);
+  const isFolder = item.type === "directory";
 
   return (
-    <div className="group bg-white border border-gray-200 rounded-lg hover:shadow-md hover:border-gray-300 transition-all duration-200">
-      <div className="flex items-center justify-between p-3 sm:p-4">
-        <div
-          className="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-1 cursor-pointer"
+    <div
+      className="group premium-card transition-all duration-200"
+      data-testid={`list-item-${item.name}`}
+    >
+      <div className="flex items-center gap-3 p-3 sm:p-3.5">
+        <button
+          type="button"
           onClick={handleOpen}
+          className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1 text-left cursor-pointer"
         >
-          <div className="flex-shrink-0 p-2 rounded-lg bg-gray-50 group-hover:bg-gray-100 transition-colors">
-            {getFileIcon(item)}
+          <div
+            className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+              isFolder
+                ? "bg-[var(--primary-soft)]"
+                : "bg-[var(--surface-3)] group-hover:bg-[var(--surface-tint)]"
+            }`}
+            style={{ border: "1px solid var(--border-subtle)" }}
+          >
+            <div className="scale-110">{getFileIcon(item, "list")}</div>
           </div>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center space-x-2 mb-1">
-              <h3 className="text-sm font-medium text-gray-900 truncate">
+            <div className="flex items-center gap-2 mb-0.5">
+              <h3 className="text-sm font-semibold text-[var(--text-primary)] truncate">
                 {item.name}
               </h3>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                {item.type === "directory"
+              <span className="chip !py-0.5 !px-1.5 text-[10px] hidden sm:inline-flex">
+                {isFolder
                   ? "Folder"
                   : item.name.split(".").pop()?.toUpperCase() || "File"}
               </span>
             </div>
-            <div className="flex items-center space-x-2 sm:space-x-4 text-xs text-gray-500">
-              <span className="flex items-center space-x-1">
-                <span className="hidden sm:inline">Size:</span>
-                <span className="font-medium">{formatFileSize(item.size)}</span>
+            <div className="flex items-center gap-3 text-xs text-[var(--text-muted)]">
+              <span className="font-medium">
+                {isFolder ? "—" : formatFileSize(item.size)}
               </span>
-              <span className="hidden sm:flex items-center space-x-1">
-                <span>Modified:</span>
-                <span className="font-medium">
-                  {formatDate(item.updatedAt)}
-                </span>
+              <span className="text-[var(--text-subtle)] hidden sm:inline">
+                ·
+              </span>
+              <span className="hidden sm:inline">
+                {formatDate(item.updatedAt)}
               </span>
             </div>
           </div>
-        </div>
+        </button>
 
-        <div className="flex items-center space-x-1 sm:space-x-2">
-          {item.type === "file" && (
-            <button
-              onClick={(e) => handleAction(e, "download")}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors sm:opacity-0 sm:group-hover:opacity-100 hidden sm:flex"
-              title="Download"
-            >
-              <Download className="w-4 h-4 text-gray-500" />
-            </button>
-          )}
-
+        <div className="flex-shrink-0 relative">
           <button
-            onClick={(e) => handleAction(e, "details")}
-            className="hidden sm:flex p-2 rounded-lg hover:bg-gray-100 transition-colors sm:opacity-0 sm:group-hover:opacity-100"
-            title="Details"
+            ref={menuButtonRef}
+            onClick={(e) => {
+              e.stopPropagation();
+              setActiveDropdown(activeDropdown === item._id ? null : item._id);
+            }}
+            data-testid={`list-item-menu-${item.name}`}
+            className="p-2 rounded-lg hover:bg-[var(--surface-3)] transition"
           >
-            <Info className="w-4 h-4 text-gray-500" />
+            <MoreVertical className="w-4 h-4 text-[var(--text-secondary)]" />
           </button>
-
-          <div className="relative">
-            <button
-              ref={menuButtonRef}
-              onClick={(e) => {
-                e.stopPropagation();
-                setActiveDropdown(
-                  activeDropdown === item._id ? null : item._id
-                );
-              }}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              <MoreVertical className="w-4 h-4 text-gray-500" />
-            </button>
-            {activeDropdown === item._id && (
-              <DropdownMenu
-                item={item}
-                anchorRef={menuButtonRef}
-                setActiveDropdown={setActiveDropdown}
-                handleAction={handleAction}
-              />
-            )}
-          </div>
+          {activeDropdown === item._id && (
+            <DropdownMenu
+              item={item}
+              anchorRef={menuButtonRef}
+              setActiveDropdown={setActiveDropdown}
+              handleAction={handleAction}
+            />
+          )}
         </div>
       </div>
     </div>

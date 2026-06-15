@@ -1,4 +1,4 @@
-import { LogOut } from "lucide-react";
+import { LogOut, Monitor, Smartphone } from "lucide-react";
 import { logout, logoutAll } from "../../Apis/authApi";
 import { useModal } from "../../Contexts/ModalContext";
 import { useNavigate } from "react-router-dom";
@@ -14,7 +14,7 @@ const LogoutOptions = () => {
     if (res.success) {
       showModal("Success", "Logged out successfully!", "success");
       setIsAuth(false);
-      setTimeout(() => navigate("/login"), 1500);
+      setTimeout(() => navigate("/login"), 1200);
     } else {
       showModal("Error", "Logout failed", "error");
     }
@@ -40,48 +40,65 @@ const LogoutOptions = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-      <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6 flex items-center">
-        <LogOut className="mr-2" size={20} />
-        Logout Options
-      </h2>
+    <div className="premium-card p-5 sm:p-6" data-testid="logout-options-card">
+      <div className="flex items-start gap-3 mb-5">
+        <div className="w-9 h-9 rounded-xl bg-[var(--primary-soft)] flex items-center justify-center flex-shrink-0">
+          <LogOut className="w-4.5 h-4.5 text-[var(--primary)]" />
+        </div>
+        <div>
+          <h2 className="text-lg font-bold text-[var(--text-primary)]">
+            Active sessions
+          </h2>
+          <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-0.5">
+            Sign out of this device or every device where you are signed in.
+          </p>
+        </div>
+      </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="p-4 border border-gray-200 rounded-lg hover:border-orange-300 transition-colors">
-          <div className="flex items-center space-x-3 mb-3">
-            <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-              <LogOut size={18} className="text-orange-600" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="rounded-2xl border border-[var(--border)] p-4 bg-[var(--surface-2)]">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-9 h-9 rounded-xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center">
+              <Monitor className="w-4 h-4 text-[var(--text-secondary)]" />
             </div>
             <div>
-              <h3 className="font-medium text-gray-900">Current Device</h3>
-              <p className="text-sm text-gray-600">
-                Logout from this device only
+              <p className="text-sm font-semibold text-[var(--text-primary)]">
+                This device
+              </p>
+              <p className="text-xs text-[var(--text-muted)]">
+                Sign out from this browser
               </p>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="w-full bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 transition-colors"
+            data-testid="logout-btn"
+            className="w-full px-3 py-2 rounded-xl premium-button-secondary text-sm"
           >
-            Logout
+            Sign out
           </button>
         </div>
 
-        <div className="p-4 border border-gray-200 rounded-lg hover:border-red-300 transition-colors">
-          <div className="flex items-center space-x-3 mb-3">
-            <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-              <LogOut size={18} className="text-red-600" />
+        <div className="rounded-2xl border border-[var(--border)] p-4 bg-[var(--surface-2)]">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-9 h-9 rounded-xl bg-[var(--danger-soft)] border border-[rgba(239,68,68,0.18)] flex items-center justify-center">
+              <Smartphone className="w-4 h-4 text-[var(--danger)]" />
             </div>
             <div>
-              <h3 className="font-medium text-gray-900">All Devices</h3>
-              <p className="text-sm text-gray-600">Logout from all devices</p>
+              <p className="text-sm font-semibold text-[var(--text-primary)]">
+                All devices
+              </p>
+              <p className="text-xs text-[var(--text-muted)]">
+                Sign out everywhere
+              </p>
             </div>
           </div>
           <button
             onClick={handleLogoutAll}
-            className="w-full bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
+            data-testid="logout-all-btn"
+            className="w-full px-3 py-2 rounded-xl text-sm font-semibold text-[var(--danger-strong)] bg-[var(--danger-soft)] border border-[rgba(239,68,68,0.18)] hover:bg-[rgba(239,68,68,0.12)] transition-all"
           >
-            Logout All
+            Sign out everywhere
           </button>
         </div>
       </div>

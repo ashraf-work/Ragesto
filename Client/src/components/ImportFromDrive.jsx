@@ -121,15 +121,20 @@ export default function ImportFromDrive({
           onClick={handleOpen}
           disabled={disabled}
           aria-disabled={disabled}
+          data-testid="import-drive-btn-mobile"
           title={`${active ? "Importing Files" : "Import Google Files"}`}
-          className={` flex flex-col items-center gap-1 flex-1 touch-manipulation active:scale-95 transition-transform
-    ${active || Object.keys(progressMap).length > 0 ? "cursor-not-allowed" : ""}
+          className={`flex flex-col items-center gap-1 flex-1 touch-manipulation active:scale-95 transition-transform
+    ${disabled ? "cursor-not-allowed" : ""}
   `}
         >
-          <div className="p-3 rounded-full bg-purple-500 active:bg-purple-600 transition-colors">
+          <div
+            className={`p-3 rounded-2xl transition-colors ${
+              disabled ? "bg-[var(--surface-3)]" : "bg-[#7c3aed] active:brightness-95"
+            }`}
+          >
             <FaGoogleDrive className="w-5 h-5 text-white" />
           </div>
-          <span className="text-xs font-medium text-gray-700">Drive</span>
+          <span className="text-[11px] font-semibold text-[var(--text-secondary)]">Drive</span>
         </button>
       </>
     );
@@ -140,17 +145,18 @@ export default function ImportFromDrive({
       <button
         onClick={handleOpen}
         disabled={disabled}
+        data-testid="import-drive-btn"
         title={`${active ? "Importing Files" : "Import Google Files"}`}
-        className={`group relative inline-flex items-center justify-center w-full sm:w-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-sm font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-sm min-h-[48px] sm:min-w-[140px] lg:min-w-[160px]
+        className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm rounded-xl transition-all duration-200
     ${
-      active || Object.keys(progressMap).length > 0
-        ? "bg-gray-200 text-gray-400 border-gray-200 cursor-not-allowed shadow-none"
-        : "bg-white text-gray-700 border-2 border-gray-300 hover:border-purple-400 hover:text-purple-700 hover:bg-purple-50 hover:shadow-md focus:ring-purple-500 flex justify-center gap-2"
+      disabled
+        ? "bg-[var(--surface-3)] text-[var(--text-subtle)] cursor-not-allowed"
+        : "premium-button-secondary hover:border-[#a78bfa]"
     }
   `}
       >
-        <FaGoogleDrive className="w-5 h-5" />
-        <span className="truncate">Import from Drive</span>
+        <FaGoogleDrive className="w-4 h-4 text-[#7c3aed]" />
+        <span>From Drive</span>
       </button>
     </div>
   );

@@ -22,6 +22,7 @@ import { secretKey } from "./utils/Constants.js";
 
 // Database Connection
 import { connectDB } from "./config/db.js";
+import { ensureSubscriptionIndexes } from "./config/subscriptionIndexes.js";
 
 // Security Imports
 import helmet from "helmet";
@@ -34,6 +35,7 @@ import { verifySubscriptionId } from "./controllers/subscriptionControllers.js";
 
 // Connect to MongoDB
 await connectDB();
+await ensureSubscriptionIndexes();
 
 export const rootPath = import.meta.dirname;
 

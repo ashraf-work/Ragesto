@@ -1,4 +1,4 @@
-import { Folder } from "lucide-react";
+import { FolderOpen, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import FileDetailsModal from "../../components/Modals/FileDetailsModal";
 import Breadcrumb from "./Breadcrumb";
@@ -15,10 +15,7 @@ const DirectoryView = ({
   setShowShareModal,
   setCurrentFile,
 }) => {
-  const [detailsModal, setDetailsModal] = useState({
-    isOpen: false,
-    item: null,
-  });
+  const [detailsModal, setDetailsModal] = useState({ isOpen: false, item: null });
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState(
     localStorage.getItem("view") || "grid"
@@ -35,9 +32,7 @@ const DirectoryView = ({
     const filtered = allItems.filter((item) =>
       item.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
     const multiplier = sortOrder === "asc" ? 1 : -1;
-
     const getKey = (item) => {
       switch (sortBy) {
         case "size":
@@ -50,15 +45,11 @@ const DirectoryView = ({
     };
 
     return [...filtered].sort((a, b) => {
-      // 1) Directories first
       const aDir = a.type === "directory";
       const bDir = b.type === "directory";
       if (aDir !== bDir) return aDir ? -1 : 1;
-
-      // 2) Then by selected key
       const aKey = getKey(a);
       const bKey = getKey(b);
-
       if (aKey < bKey) return -1 * multiplier;
       if (aKey > bKey) return 1 * multiplier;
       return 0;
@@ -70,38 +61,74 @@ const DirectoryView = ({
   };
 
   return (
-    <div className="min-h-full max-[800px]:pb-20">
-      <div className="max-w-7xl mx-auto space-y-4">
-        {/* ToolBar -> Searching/Sorting/viewing */}
-        <ToolBar
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          viewMode={viewMode}
-          setViewMode={handleViewMode}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          sortOrder={sortOrder}
-          setSortOrder={setSortOrder}
-          itemCount={filteredAndSortedItems.length}
-        />
+    <div className="min-h-full max-[800px]:pb-28" data-testid="directory-view">
+      <div className="space-y-4">
+        {/* Breadcrumb + Toolbar */}
+        <div className="space-y-3">
+          <Breadcrumb breadCrumb={breadCrumb} />
+          <ToolBar
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            viewMode={viewMode}
+            setViewMode={handleViewMode}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            sortOrder={sortOrder}
+            setSortOrder={setSortOrder}
+            itemCount={filteredAndSortedItems.length}
+          />
+        </div>
 
-        {/* Breadcrumb */}
-        <Breadcrumb breadCrumb={breadCrumb} />
+        {/* Section header */}
+        <div className="flex items-center justify-between pt-1">
+          <h2 className="text-base font-semibold text-[var(--text-primary)]">
+            All items
+            {filteredAndSortedItems.length > 0 && (
+              <span className="ml-2 text-sm font-medium text-[var(--text-subtle)]">
+                ({filteredAndSortedItems.length})
+              </span>
+            )}
+          </h2>
+          {searchTerm && filteredAndSortedItems.length > 0 && (
+            <button
+              onClick={() => setSearchTerm("")}
+              className="text-xs font-semibold text-[var(--primary)] hover:text-[var(--primary-hover)]"
+            >
+              Clear search
+            </button>
+          )}
+        </div>
 
-        {/* Content */}
         {/* Items Grid/List */}
         {loading ? (
-          <div className="premium-empty flex flex-col items-center justify-center py-20">
-            <div className="h-12 w-12 rounded-full premium-skeleton mb-4"></div>
-            <div className="h-3 w-40 rounded-full premium-skeleton"></div>
+          <div
+            className={
+              viewMode === "grid"
+                ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
+                : "space-y-2"
+            }
+            data-testid="directory-loading"
+          >
+            {Array.from({ length: viewMode === "grid" ? 8 : 6 }).map((_, idx) => (
+              <div key={idx} className="premium-card p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl premium-skeleton" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 w-3/4 premium-skeleton" />
+                    <div className="h-2 w-1/2 premium-skeleton" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : filteredAndSortedItems.length > 0 ? (
           <div
             className={
               viewMode === "grid"
-                ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 max-w-none"
+                ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4"
                 : "space-y-2"
             }
+            data-testid="directory-items"
           >
             {filteredAndSortedItems.map((item) => (
               <ItemCard
@@ -118,22 +145,32 @@ const DirectoryView = ({
             ))}
           </div>
         ) : (
-          <div className="premium-empty text-center py-14 px-6">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--surface-blue)]">
-              <Folder className="w-8 h-8 text-[var(--primary)]" />
+          <div className="premium-empty text-center py-16 px-6 animate-fade-up" data-testid="directory-empty">
+            <div
+              className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl"
+              style={{
+                background:
+                  "linear-gradient(135deg, rgba(99,102,241,0.12), rgba(6,182,212,0.10))",
+                border: "1px solid var(--border)",
+              }}
+            >
+              {searchTerm ? (
+                <Search className="w-7 h-7 text-[var(--primary)]" />
+              ) : (
+                <FolderOpen className="w-7 h-7 text-[var(--primary)]" />
+              )}
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {searchTerm ? "No results found" : "No files or folders"}
+            <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1.5">
+              {searchTerm ? "No matches found" : "This space is empty"}
             </h3>
-            <p className="text-gray-500">
+            <p className="text-sm text-[var(--text-muted)] max-w-md mx-auto">
               {searchTerm
-                ? `No items match "${searchTerm}". Try a different search term.`
-                : "Upload some files or create a directory to get started"}
+                ? `Try a different keyword or clear the search to see all your files.`
+                : "Upload your first file or create a folder to start organising your cloud workspace."}
             </p>
           </div>
         )}
 
-        {/* File Details Modal */}
         <FileDetailsModal
           item={detailsModal.item}
           isOpen={detailsModal.isOpen}

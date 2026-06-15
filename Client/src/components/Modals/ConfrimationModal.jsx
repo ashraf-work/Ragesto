@@ -1,5 +1,26 @@
-import { AlertCircle, Loader2 } from "lucide-react";
+import { AlertCircle, AlertTriangle, Info, Loader2, ShieldAlert } from "lucide-react";
 import { useState } from "react";
+
+const TYPE = {
+  danger: {
+    icon: ShieldAlert,
+    iconColor: "text-[var(--danger)]",
+    iconBg: "bg-[var(--danger-soft)]",
+    btnClass: "bg-[var(--danger)] hover:bg-[var(--danger-strong)] text-white",
+  },
+  warning: {
+    icon: AlertTriangle,
+    iconColor: "text-[var(--warning-strong)]",
+    iconBg: "bg-[var(--warning-soft)]",
+    btnClass: "bg-[var(--warning)] hover:brightness-95 text-white",
+  },
+  info: {
+    icon: Info,
+    iconColor: "text-[var(--primary)]",
+    iconBg: "bg-[var(--primary-soft)]",
+    btnClass: "premium-button-primary",
+  },
+};
 
 const ConfirmationModal = ({
   isOpen,
@@ -12,33 +33,9 @@ const ConfirmationModal = ({
   type = "warning",
 }) => {
   const [loading, setLoading] = useState(false);
-
   if (!isOpen) return null;
 
-  const getIconAndColor = () => {
-    switch (type) {
-      case "danger":
-        return {
-          icon: AlertCircle,
-          color: "text-red-600",
-          buttonColor: "bg-[var(--error)] hover:brightness-95",
-        };
-      case "warning":
-        return {
-          icon: AlertCircle,
-          color: "text-yellow-600",
-          buttonColor: "bg-[var(--warning)] hover:brightness-95",
-        };
-      default:
-        return {
-          icon: AlertCircle,
-          color: "text-blue-600",
-          buttonColor: "premium-button-primary",
-        };
-    }
-  };
-
-  const { icon: Icon, color, buttonColor } = getIconAndColor();
+  const { icon: Icon, iconColor, iconBg, btnClass } = TYPE[type] || TYPE.warning;
 
   const handleConfirm = async () => {
     try {
@@ -52,37 +49,49 @@ const ConfirmationModal = ({
 
   return (
     <div
-      className="fixed inset-0 bg-slate-900/30 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in"
       onClick={onClose}
     >
       <div
-        className="premium-panel p-6 w-full max-w-sm"
+        className="premium-panel w-full max-w-md overflow-hidden animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center space-x-2 mb-4">
-          <Icon className={`${color} w-6 h-6`} />
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+        <div className="p-5 sm:p-6">
+          <div className="flex items-start gap-3 mb-4">
+            <div className={`w-10 h-10 rounded-2xl ${iconBg} flex items-center justify-center flex-shrink-0`}>
+              <Icon className={`w-5 h-5 ${iconColor}`} />
+            </div>
+            <div className="pt-1.5">
+              <h3 className="text-base sm:text-lg font-bold text-[var(--text-primary)]">
+                {title}
+              </h3>
+              <p className="text-xs text-[var(--text-subtle)] mt-0.5">
+                Please confirm to continue
+              </p>
+            </div>
+          </div>
+          <div className="text-sm text-[var(--text-muted)] leading-relaxed">
+            {message}
+          </div>
         </div>
-        <div className="text-gray-600 mb-6">{message}</div>
-        <div className="flex justify-end space-x-3">
+        <div className="flex justify-end gap-2 p-4 bg-[var(--surface-2)] border-t border-[var(--border-subtle)]">
           <button
             onClick={onClose}
             disabled={loading}
-            className="px-4 py-2 rounded-xl premium-button-secondary disabled:opacity-50"
+            className="px-4 py-2 rounded-xl premium-button-secondary text-sm disabled:opacity-50"
           >
             {cancelText}
           </button>
-
           <button
             onClick={handleConfirm}
             disabled={loading}
-            className={`px-4 py-2 rounded-xl text-white flex items-center gap-2 ${buttonColor} ${
+            className={`inline-flex items-center justify-center px-4 py-2 rounded-xl text-sm font-semibold transition-all ${btnClass} ${
               loading ? "opacity-70 cursor-not-allowed" : ""
             }`}
           >
             {loading ? (
               <>
-                <Loader2 className="animate-spin w-5 h-5" />
+                <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
                 Processing...
               </>
             ) : (

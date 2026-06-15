@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host",
+    "dev": "vite --host --port 5173",
+    "start": "vite --host 0.0.0.0 --port 3000",
     "all-device": "npm run dev -- --host 0.0.0.0",
     "build": "vite build",
     "lint": "eslint .",
@@ -12,7 +13,9 @@
   },
   "dependencies": {
     "@cyntler/react-doc-viewer": "^1.14.1",
+    "@fontsource-variable/plus-jakarta-sans": "^5.2.8",
     "@fontsource/inter": "^5.2.8",
+    "@fontsource/plus-jakarta-sans": "^5.2.8",
     "@googleworkspace/drive-picker-element": "^0.6.1",
     "@react-oauth/google": "^0.12.2",
     "@tailwindcss/vite": "^4.1.7",

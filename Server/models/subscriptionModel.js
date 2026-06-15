@@ -13,9 +13,6 @@ const subscriptionSchema = new Schema(
     },
     stripeSubscriptionId: {
       type: String,
-      default: null,
-      unique: true,
-      sparse: true,
     },
     stripeCustomerId: {
       type: String,
@@ -23,9 +20,6 @@ const subscriptionSchema = new Schema(
     },
     stripeCheckoutSessionId: {
       type: String,
-      default: null,
-      unique: true,
-      sparse: true,
     },
     stripeCheckoutSessionUrl: {
       type: String,
@@ -82,6 +76,24 @@ const subscriptionSchema = new Schema(
     strict: "throw",
     timestamps: true,
   }
+);
+
+subscriptionSchema.index(
+  { stripeSubscriptionId: 1 },
+  {
+    unique: true,
+    name: "stripeSubscriptionId_unique_string",
+    partialFilterExpression: { stripeSubscriptionId: { $type: "string" } },
+  },
+);
+
+subscriptionSchema.index(
+  { stripeCheckoutSessionId: 1 },
+  {
+    unique: true,
+    name: "stripeCheckoutSessionId_unique_string",
+    partialFilterExpression: { stripeCheckoutSessionId: { $type: "string" } },
+  },
 );
 
 const Subscription = model("Subscription", subscriptionSchema);
